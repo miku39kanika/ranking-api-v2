@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RankingController;
+use App\Http\Controllers\RankingItemController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\LikeController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\VoteController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\FollowController;
+use App\Http\Controllers\GameController;
+use App\Http\Controllers\CurrencyController;
+
+Route::get('/rankings', [RankingController::class, 'index']);
+Route::post('/vote', [VoteController::class, 'vote']);
+Route::get('/items/{id}', [RankingItemController::class, 'show']);
+Route::get('/ranking/{id}', [RankingController::class, 'show']);
+Route::post('/items', [RankingItemController::class, 'store']);
+Route::post('/rankings', [RankingController::class, 'store']);
+Route::post('/items/{id}/alias', [RankingItemController::class, 'addAlias']);
+Route::delete('/items/{id}/alias/{alias}', [RankingItemController::class, 'deleteAlias']);
+Route::post('/auth/guest', [AuthController::class, 'guestLogin']);
+Route::get('/users/{device_id}', [UserController::class, 'show']);
+Route::post('/likes/toggle', [LikeController::class, 'toggle']);
+Route::get('/likes/{user_id}', [LikeController::class, 'index']);
+Route::get('/ranking/row/{id}', [RankingController::class, 'rowShow']);
+Route::put('/users/{id}', [UserController::class, 'update']);
+Route::get('/random-rankings', [RankingController::class, 'random']);
+Route::post('/comments', [CommentController::class, 'store']);
+Route::get('/comments/{ranking_id}', [CommentController::class, 'index']);
+Route::post('/follow', [FollowController::class, 'follow']);
+Route::get('/follow/counts/{userId}', [FollowController::class, 'counts']);
+Route::get('/follow/followings/{userId}', [FollowController::class, 'followings']);
+Route::get('/follow/followers/{userId}', [FollowController::class, 'followers']);
+Route::get('/game/session', [GameController::class, 'getSession']);
+Route::get('/rankings/user/{userId}', [RankingController::class, 'getByUser']);
+Route::get('/users/{userId}/currencies',[CurrencyController::class, 'index']);
+Route::post('/currency/change', [CurrencyController::class, 'change']);
