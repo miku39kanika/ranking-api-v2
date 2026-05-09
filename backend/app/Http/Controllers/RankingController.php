@@ -19,7 +19,8 @@ class RankingController extends Controller
     // ① リクエスト内容
     $userId = $request->query('user_id');
 
-    $rankings = Ranking::select('rankings.*')
+    $rankings = Ranking::with('tags')
+    ->select('rankings.*')
         ->selectRaw("
             EXISTS (
                 SELECT 1 FROM likes
@@ -29,12 +30,31 @@ class RankingController extends Controller
         ", [$userId])
         ->get();
 
-    return response()->json($rankings);
+    return response()->json(
+    $rankings->map(function ($ranking) {
+
+        return [
+            'id' => $ranking->id,
+            'title' => $ranking->title,
+            'reading' => $ranking->reading,
+            'is_liked' => $ranking->is_liked,
+
+            'tags' => $ranking->tags->map(function ($tag) {
+                return [
+                    'id' => $tag->id,
+                    'name' => $tag->name,
+                ];
+            }),
+
+            'items' => [],
+        ];
+    })
+);
 }
 public function show($id)
 {
     Log::info('RankingController@show called');
-    $ranking = Ranking::with('items')->find($id);
+    $ranking = Ranking::with(['items', 'tags'])->find($id);
 
     if (!$ranking) {
         return response()->json([
@@ -56,14 +76,19 @@ public function show($id)
                 'aliases' => $item->aliases,
             ];
         }),
+        'tags' => $ranking->tags->map(function ($tag) {
+            return [
+                'id' => $tag->id,
+                'name' => $tag->name,
+            ];
+        }),
     ]);
 }
 public function rowShow($id)
 {
     Log::info('RankingController@rowShow called');
 
-    $ranking = Ranking::with('items')->find($id);
-    $ranking = Ranking::with(['items', 'user'])->find($id);
+    $ranking = Ranking::with(['items', 'user', 'tags'])->find($id);
     if (!$ranking) {
         return response()->json([
             'message' => 'Ranking not found'
@@ -75,6 +100,12 @@ public function rowShow($id)
         'title' => $ranking->title,
         'reading' => $ranking->reading,
         'is_liked' => 0,
+        'tags' => $ranking->tags->map(function ($tag) {
+            return [
+                'id' => $tag->id,
+                'name' => $tag->name,
+            ];
+        }),
         'items' => $ranking->items->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -108,6 +139,7 @@ public function store(Request $request)
         'vote_permission' => $request->vote_permission,
         'user_id' => $request->user_id,
     ]);
+$ranking->tags()->sync($request->tag_ids);
 
     return response()->json($ranking);
 }

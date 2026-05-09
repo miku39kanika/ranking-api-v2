@@ -62,4 +62,8 @@ public function followers()
         'follower_id'
     );
 }
+public function tags()
+{
+    return $this->belongsToMany(Tag::class);
+}
 }

@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         ItemsTableSeeder::class,
         UserItemsTableSeeder::class,
         CurrencySeeder::class,
+         TagTableSeeder::class,
        
 ]);
     }
