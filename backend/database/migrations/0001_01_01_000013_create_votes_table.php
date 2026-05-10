@@ -13,6 +13,7 @@ return new class extends Migration
 {
     Schema::create('votes', function (Blueprint $table) {
         $table->id();
+        $table->foreignId('ranking_id')->constrained()->onDelete('cascade');
         $table->foreignId('ranking_item_id')->constrained()->onDelete('cascade');
         $table->string('user_identifier',64); // IP or UUID
         $table->timestamps();

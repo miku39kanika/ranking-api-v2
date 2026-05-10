@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Log;
 use App\Models\UserCurrency;
 use App\Models\Currency;
 use App\Models\CurrencyHistory;
+use App\Models\PersonalRanking;
+
 class AuthController extends Controller
 {
     public function guestLogin(Request $request)
@@ -47,6 +49,10 @@ class AuthController extends Controller
                 'currency_id' => $orb->id,
                 'amount' => 100,
                 'reason' => '初回登録ボーナス',
+            ]);
+            PersonalRanking::create([
+            'user_id' => $user->id,
+            'title' => '',
             ]);
         }
 // 🔥 ログ出力

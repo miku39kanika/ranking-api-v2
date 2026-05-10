@@ -56,6 +56,7 @@ public function vote(Request $request)
 
     // ③ 保存
     Vote::create([
+        'ranking_id' => $item->ranking_id,
         'ranking_item_id' => $itemId,
         'user_identifier' => $userId,
         'vote_date' => $today
@@ -67,5 +68,38 @@ public function vote(Request $request)
         'success' => true,
         'queued' => true
     ]);
+}
+public function votedRankings($userId)
+{
+    $votes = Vote::where(
+        'user_identifier',
+        $userId
+    )
+    ->orderByDesc('created_at')
+    ->get();
+
+    $rankingIds = $votes
+        ->pluck('ranking_id')
+        ->unique();
+
+    $rankings = Ranking::whereIn(
+        'id',
+        $rankingIds
+    )
+    ->get()
+    ->map(function ($ranking) use ($votes) {
+
+        $vote = $votes->firstWhere(
+            'ranking_id',
+            $ranking->id
+        );
+
+        $ranking->vote_date =
+            $vote?->vote_date;
+
+        return $ranking;
+    });
+
+    return response()->json($rankings);
 }
 }

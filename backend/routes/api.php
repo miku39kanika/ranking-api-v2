@@ -12,6 +12,8 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\CurrencyController;
+use App\Http\Controllers\TagController;
+use App\Http\Controllers\PersonalRankingController;
 
 Route::get('/rankings', [RankingController::class, 'index']);
 Route::post('/vote', [VoteController::class, 'vote']);
@@ -38,3 +40,7 @@ Route::get('/game/session', [GameController::class, 'getSession']);
 Route::get('/rankings/user/{userId}', [RankingController::class, 'getByUser']);
 Route::get('/users/{userId}/currencies',[CurrencyController::class, 'index']);
 Route::post('/currency/change', [CurrencyController::class, 'change']);
+Route::get('/tags', [TagController::class, 'index']);
+Route::get('/personal-ranking/{userId}', [PersonalRankingController::class, 'show']);
+Route::put('/personal-ranking', [PersonalRankingController::class, 'update']);
+Route::get('/users/{userId}/voted-rankings',[VoteController::class, 'votedRankings']);
