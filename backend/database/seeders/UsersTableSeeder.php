@@ -11,7 +11,7 @@ class UsersTableSeeder extends Seeder
 {
     public function run(): void
     {
-        $iconNames = ['ast01', 'ast02', 'ast03'];
+        $iconNames = ['ast01', 'ast02', 'ast03', 'icon99'];
 
         $users = [];
 
