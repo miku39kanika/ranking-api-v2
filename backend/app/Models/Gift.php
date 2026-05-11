@@ -11,6 +11,9 @@ class Gift extends Model
         'body',
         'case',
         'user_id',
+        'reward_type',
+        'reward_code',
+        'reward_amount',
         'expires_at',
         'from_date',
         'send_at',
@@ -18,6 +21,8 @@ class Gift extends Model
 
     protected $casts = [
         'send_at' => 'datetime',
+        'expires_at' => 'datetime',
+        'from_date' => 'datetime',
     ];
 
     public function user()

@@ -89,6 +89,15 @@ public function receive(Request $request)
     $giftId = $request->gift_id;
 
     // =====================
+    // ギフト取得
+    // =====================
+    $gift = DB::table('gifts')->where('id', $giftId)->first();
+
+    if (!$gift) {
+        return response()->json(['message' => 'gift not found'], 404);
+    }
+
+    // =====================
     // 二重受け取り防止
     // =====================
     $exists = DB::table('user_gifts')
@@ -97,32 +106,75 @@ public function receive(Request $request)
         ->exists();
 
     if ($exists) {
-        return response()->json([
-            'message' => 'already received'
-        ], 200);
+        return response()->json(['message' => 'already received'], 200);
     }
 
-    DB::transaction(function () use ($userId, $giftId) {
+    DB::transaction(function () use ($userId, $gift) {
 
         // =====================
-        // 履歴登録
+        // 受け取り履歴
         // =====================
         DB::table('user_gifts')->insert([
             'user_id' => $userId,
-            'gift_id' => $giftId,
+            'gift_id' => $gift->id,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
         // =====================
-        // 報酬付与（例：orb）
+        // reward処理
         // =====================
-        $gift = DB::table('gifts')->where('id', $giftId)->first();
+        switch ($gift->reward_type) {
 
-        if ($gift && isset($gift->reward_orb)) {
-            DB::table('users')
-                ->where('id', $userId)
-                ->increment('orb', $gift->reward_orb);
+            // =====================
+            // currency付与
+            // =====================
+            case 'currency':
+
+                DB::table('user_currencies')
+                    ->updateOrInsert(
+                        [
+                            'user_id' => $userId,
+                            'currency_id' => $gift->reward_code, // ←そのままID
+                        ],
+                        [
+                            'amount' => DB::raw('amount + ' . $gift->reward_amount),
+                            'updated_at' => now(),
+                            'created_at' => now(),
+                        ]
+                    );
+
+                DB::table('currency_histories')->insert([
+                    'user_id' => $userId,
+                    'currency_id' => $gift->reward_code,
+                    'amount' => $gift->reward_amount,
+                    'reason' => 'gift',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                break;
+
+            // =====================
+            // item付与
+            // =====================
+            case 'item':
+
+                DB::table('user_items')
+                    ->updateOrInsert(
+                        [
+                            'user_id' => $userId,
+                            'item_id' => $gift->reward_code, // ←そのままID
+                        ],
+                        [
+                            'quantity' => DB::raw('quantity + ' . $gift->reward_amount),
+                            'expires_at' => null,
+                            'updated_at' => now(),
+                            'created_at' => now(),
+                        ]
+                    );
+
+                break;
         }
     });
 
