@@ -51,3 +51,4 @@ Route::get('/app/status', [AppController::class, 'status']);
 Route::get('/announcements', [AnnouncementController::class, 'index']);
 Route::get('/announcements/{id}', [AnnouncementController::class, 'show']);
 Route::get('/gifts', [GiftController::class, 'index']);
+Route::post('/gifts/receive', [GiftController::class, 'receive']);

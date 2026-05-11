@@ -14,9 +14,13 @@ if ($from = request('from')) {
 
     $query->where(function ($q) use ($from) {
 
-        $q->whereDate('created_at', '>=', $from)
-          ->orWhere('important', true);
-    });
+    $q->whereDate('created_at', '>=', $from)
+      ->where(function ($q2) {
+          $q2->whereNull('send_at')
+             ->orWhere('send_at', '<=', now());
+      })
+      ->orWhere('important', true);
+});
 }
 
 $announcements =

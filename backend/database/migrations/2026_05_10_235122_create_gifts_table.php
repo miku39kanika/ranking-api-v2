@@ -24,7 +24,7 @@ $table->string('user_id')->nullable();
 $table->dateTime('expires_at')->nullable();
 $table->dateTime('from_date')->nullable();
 
-    $table->boolean('received')->default(false); // ←重要
+     $table->dateTime('send_at')->nullable()->index();
 
     $table->timestamps();
 });

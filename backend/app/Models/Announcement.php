@@ -10,9 +10,11 @@ class Announcement extends Model
         'title',
         'body',
         'important',
+        'send_at',
     ];
 
     protected $casts = [
         'important' => 'boolean',
+        'send_at' => 'datetime',
     ];
 }

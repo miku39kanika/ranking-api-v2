@@ -13,10 +13,11 @@ class Gift extends Model
         'user_id',
         'expires_at',
         'from_date',
+        'send_at',
     ];
 
     protected $casts = [
-        'received' => 'boolean',
+        'send_at' => 'datetime',
     ];
 
     public function user()

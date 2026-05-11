@@ -20,6 +20,7 @@ return new class extends Migration
     $table->text('body');
 
     $table->boolean('important')->default(false);
+    $table->dateTime('send_at')->nullable()->index();
 
     $table->timestamps();
 });

@@ -20,7 +20,6 @@ class GiftSeeder extends Seeder
             'user_id' => null,
             'from_date' => null,
             'expires_at' => Carbon::now()->addDays(30),
-            'received' => false,
         ]);
 
         // =====================
@@ -33,7 +32,6 @@ class GiftSeeder extends Seeder
             'user_id' => null,
             'from_date' => Carbon::now()->subDays(3),
             'expires_at' => Carbon::now()->addDays(7),
-            'received' => false,
         ]);
 
         // =====================
@@ -46,7 +44,6 @@ class GiftSeeder extends Seeder
             'user_id' => "6A0552D5-6C20-4A7D-8B23-373B90F1033F", // ←テストユーザーID
             'from_date' => null,
             'expires_at' => Carbon::now()->addDays(14),
-            'received' => false,
         ]);
 
         // =====================
@@ -59,7 +56,6 @@ class GiftSeeder extends Seeder
             'user_id' => "2",
             'from_date' => null,
             'expires_at' => Carbon::now()->addDays(14),
-            'received' => false,
         ]);
     }
 }
