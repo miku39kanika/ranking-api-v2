@@ -20,7 +20,8 @@ class DatabaseSeeder extends Seeder
         UserItemsTableSeeder::class,
         CurrencySeeder::class,
          TagTableSeeder::class,
-       
+       AnnouncementSeeder::class,
+       GiftSeeder::class,
 ]);
     }
 }

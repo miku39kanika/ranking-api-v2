@@ -14,6 +14,9 @@ use App\Http\Controllers\GameController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\PersonalRankingController;
+use App\Http\Controllers\AppController;
+use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\GiftController;
 
 Route::get('/rankings', [RankingController::class, 'index']);
 Route::post('/vote', [VoteController::class, 'vote']);
@@ -44,3 +47,7 @@ Route::get('/tags', [TagController::class, 'index']);
 Route::get('/personal-ranking/{userId}', [PersonalRankingController::class, 'show']);
 Route::put('/personal-ranking', [PersonalRankingController::class, 'update']);
 Route::get('/users/{userId}/voted-rankings',[VoteController::class, 'votedRankings']);
+Route::get('/app/status', [AppController::class, 'status']);
+Route::get('/announcements', [AnnouncementController::class, 'index']);
+Route::get('/announcements/{id}', [AnnouncementController::class, 'show']);
+Route::get('/gifts', [GiftController::class, 'index']);
