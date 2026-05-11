@@ -10,6 +10,7 @@ use App\Models\UserCurrency;
 use App\Models\Currency;
 use App\Models\CurrencyHistory;
 use App\Models\PersonalRanking;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -50,10 +51,44 @@ class AuthController extends Controller
                 'amount' => 100,
                 'reason' => '初回登録ボーナス',
             ]);
-            PersonalRanking::create([
+            
+            $ranking = PersonalRanking::create([
+    'user_id' => $user->id,
+    'title' => '',
+]);
+
+$ranking->items()->createMany([
+    [
+        'rank' => 1,
+        'word' => '',
+    ],
+    [
+        'rank' => 2,
+        'word' => '',
+    ],
+    [
+        'rank' => 3,
+        'word' => '',
+    ],
+]);
+
+            $starterItems = DB::table('starter_items')
+    ->where('is_active', true)
+    ->where('trigger', 'register')
+    ->get();
+    foreach ($starterItems as $item) {
+    DB::table('user_items')->updateOrInsert(
+        [
             'user_id' => $user->id,
-            'title' => '',
-            ]);
+            'item_id' => $item->item_id,
+        ],
+        [
+            'quantity' => DB::raw('quantity + ' . $item->quantity),
+            'updated_at' => now(),
+            'created_at' => now(),
+        ]
+    );
+}
         }
 // 🔥 ログ出力
 Log::info('USER', ['user' => $user]);

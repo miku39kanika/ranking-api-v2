@@ -17,10 +17,10 @@ use App\Http\Controllers\PersonalRankingController;
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\GiftController;
+use App\Http\Controllers\ItemController;
 
 Route::get('/rankings', [RankingController::class, 'index']);
 Route::post('/vote', [VoteController::class, 'vote']);
-Route::get('/items/{id}', [RankingItemController::class, 'show']);
 Route::get('/ranking/{id}', [RankingController::class, 'show']);
 Route::post('/items', [RankingItemController::class, 'store']);
 Route::post('/rankings', [RankingController::class, 'store']);
@@ -52,3 +52,5 @@ Route::get('/announcements', [AnnouncementController::class, 'index']);
 Route::get('/announcements/{id}', [AnnouncementController::class, 'show']);
 Route::get('/gifts', [GiftController::class, 'index']);
 Route::post('/gifts/receive', [GiftController::class, 'receive']);
+Route::get('/items/my-icons', [ItemController::class, 'myIcons']);
+Route::get('/items/{id}', [RankingItemController::class, 'show']);

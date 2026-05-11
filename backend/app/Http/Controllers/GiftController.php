@@ -7,11 +7,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\UserGift;
 use App\Models\User;
-
+use Illuminate\Support\Facades\Log;
+    
 class GiftController extends Controller
 {
     public function index()
 {
+    Log::info('GiftController@index called');
     $userId = request('user_id');
     $from = request('from');
 
@@ -85,6 +87,7 @@ class GiftController extends Controller
 }
 public function receive(Request $request)
 {
+    Log::info('GiftController@receive called');
     $userId = $request->user_id;
     $giftId = $request->gift_id;
 

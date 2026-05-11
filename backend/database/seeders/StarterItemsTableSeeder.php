@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class StarterItemSeeder extends Seeder
+class StarterItemsTableSeeder extends Seeder
 {
     public function run(): void
     {
@@ -33,7 +33,7 @@ class StarterItemSeeder extends Seeder
                 'item_id' => 3, // ast03（アイコン）
                 'quantity' => 1,
                 'is_active' => true,
-                'trigger' => 'tutorial',
+                'trigger' => 'register',
                 'created_at' => $now,
                 'updated_at' => $now,
             ],

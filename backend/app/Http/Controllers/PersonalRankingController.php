@@ -4,19 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PersonalRanking;
-
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 class PersonalRankingController extends Controller
 {
     public function show($userId)
 {
+    Log::info('PersonalRankingController@show called');
     $ranking = PersonalRanking::with('items')
         ->where('user_id', $userId)
         ->first();
 
     return response()->json($ranking);
 }
+
 public function update(Request $request)
 {
+    Log::info('PersonalRankingController@update called');
     $ranking = PersonalRanking::where(
         'user_id',
         $request->user_id
@@ -29,22 +33,50 @@ public function update(Request $request)
         ], 404);
     }
 
-    $ranking->title = $request->title;
+   DB::transaction(function () use ($ranking, $request) {
 
-    $ranking->save();
+    // =====================
+    // title更新
+    // =====================
 
-    // 一旦全削除
-    $ranking->items()->delete();
-
-    // 再作成
-    foreach ($request->items as $item) {
-
-        $ranking->items()->create([
-
-            'rank' => $item['rank'],
-            'word' => $item['word'],
-        ]);
+    if (
+        $request->has('title') &&
+        $request->title !== null
+    ) {
+        $ranking->title = $request->title;
+        $ranking->save();
     }
+
+    // =====================
+    // items更新
+    // =====================
+
+    if (is_array($request->items)) {
+
+        foreach ($request->items as $item) {
+
+            // wordが無い/nullならスキップ
+            if (
+                !isset($item['word']) ||
+                $item['word'] === null
+            ) {
+                continue;
+            }
+
+            // rankが無いならスキップ
+            if (!isset($item['rank'])) {
+                continue;
+            }
+
+            $ranking->items()
+                ->where('rank', $item['rank'])
+                ->update([
+                    'word' => $item['word']
+                ]);
+        }
+    }
+    
+});
 
     return response()->json([
         'success' => true

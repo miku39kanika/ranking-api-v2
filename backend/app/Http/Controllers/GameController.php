@@ -10,6 +10,7 @@ class GameController extends Controller
 {
    public function getSession()
 {
+    Log::info('GameController@getSession called');
     $questions = DB::table('game_questions')
         // ->where('generated_date', today())
         ->inRandomOrder()
@@ -24,6 +25,7 @@ class GameController extends Controller
 }
     private function makeChoice($ranking)
 {
+    Log::info('GameController@makeChoice called');
     $items = $ranking->items->sortByDesc('votes')->values();
 
     if ($items->count() < 2) return null;
@@ -50,6 +52,7 @@ class GameController extends Controller
 }
 private function makeTop5($ranking)
 {
+    Log::info('GameController@makeTop5 called');
     $items = $ranking->items->sortByDesc('votes')->values();
 
     if ($items->count() < 10) return null;
@@ -71,6 +74,7 @@ private function makeTop5($ranking)
 }
 private function makePercent($ranking)
 {
+    Log::info('GameController@makePercent called');
     $items = $ranking->items;
 
     $totalVotes = $items->sum('votes');

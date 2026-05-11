@@ -10,8 +10,6 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
         UsersTableSeeder::class,
-        // RankingsTableSeeder::class,
-        // RankingItemsTableSeeder::class,
         RankingWithItemsSeeder::class,
         VotesTableSeeder::class,
         StaminasTableSeeder::class,
@@ -19,9 +17,10 @@ class DatabaseSeeder extends Seeder
         ItemsTableSeeder::class,
         UserItemsTableSeeder::class,
         CurrencySeeder::class,
-         TagTableSeeder::class,
-       AnnouncementSeeder::class,
-       GiftSeeder::class,
+        TagTableSeeder::class,
+        AnnouncementSeeder::class,
+        GiftSeeder::class,
+        StarterItemsTableSeeder::class,
 ]);
     }
 }

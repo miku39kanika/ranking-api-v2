@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
+use Illuminate\Support\Facades\Log;
 
 class AnnouncementController extends Controller
 {
     public function index()
     {
+        Log::info('AnnouncementController@index called');
         $query = Announcement::query();
 
 if ($from = request('from')) {
@@ -27,6 +29,8 @@ $announcements =
     $query
     ->latest()
     ->get();
+
+    Log::info('AnnouncementController@index called');
 
         return response()->json($announcements);
     }

@@ -6,11 +6,12 @@ use Illuminate\Http\Request;
 use App\Models\UserCurrency;
 use App\Models\Currency;
 use App\Models\CurrencyHistory;
-
+use Illuminate\Support\Facades\Log;
 class CurrencyController extends Controller
 {
     public function index($userId)
     {
+        Log::info('CurrencyController@index called');
         $currencies = UserCurrency::with('currency')
             ->where('user_id', $userId)
             ->get();
@@ -28,6 +29,7 @@ class CurrencyController extends Controller
 
     public function change(Request $request)
 {
+    Log::info('CurrencyController@change called');
     $userCurrency = UserCurrency::with('currency')
         ->where('user_id', $request->user_id)
         ->whereHas('currency', function ($q) use ($request) {
