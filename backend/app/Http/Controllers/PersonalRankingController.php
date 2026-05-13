@@ -15,6 +15,13 @@ class PersonalRankingController extends Controller
         ->where('user_id', $userId)
         ->first();
 
+        if (!$ranking) {
+        $ranking = new PersonalRanking();
+        $ranking->id = 0;
+        $ranking->user_id = $userId;
+        $ranking->title = "ランキング未作成";
+        $ranking->setRelation('items', collect([]));
+    }
     return response()->json($ranking);
 }
 

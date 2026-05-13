@@ -37,6 +37,12 @@ public function follow(Request $request)
             'following' => false
         ]);
     } else {
+        if ($this->isBlocked($me, $target))  {
+
+    return response()->json([
+        'success' => false
+    ], 403);
+}
         // 👇 未フォロー → 追加
         DB::table('follows')->insert([
             'follower_id' => $me,
@@ -50,6 +56,7 @@ public function follow(Request $request)
             'following' => true
         ]);
     }
+    
 }
 
 public function counts($userId)
@@ -92,4 +99,35 @@ public function followers($userId)
 
     return response()->json($users);
 }
+
+ // =====================
+    // ブロック判定
+    // =====================
+
+    private function isBlocked($me, $target): bool
+    {
+        return DB::table('blocks')
+
+            ->where(function ($query) use ($me, $target) {
+
+                // 自分 → 相手
+                $query->where([
+                    'user_id' => $me,
+                    'blocked_user_id' => $target
+                ]);
+
+            })
+
+            ->orWhere(function ($query) use ($me, $target) {
+
+                // 相手 → 自分
+                $query->where([
+                    'user_id' => $target,
+                    'blocked_user_id' => $me
+                ]);
+
+            })
+
+            ->exists();
+    }
 }

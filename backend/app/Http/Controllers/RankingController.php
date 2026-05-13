@@ -12,15 +12,36 @@ use App\Services\ReadingService;
 
 class RankingController extends Controller
 {
- public function index(Request $request)
+public function index(Request $request)
 {
     Log::info('RankingController@index called');
 
-    // ① リクエスト内容
     $userId = $request->query('user_id');
 
     $rankings = Ranking::with('tags')
-    ->select('rankings.*')
+
+        ->leftJoin(
+            'votes',
+            'rankings.id',
+            '=',
+            'votes.ranking_id'
+        )
+
+        ->select(
+            'rankings.*',
+            DB::raw('COUNT(DISTINCT votes.user_identifier) as recent_users')
+        )
+
+        ->where(function ($query) {
+
+            $query->where(
+                'votes.created_at',
+                '>=',
+                now()->subDay()
+            )
+            ->orWhereNull('votes.id');
+        })
+
         ->selectRaw("
             EXISTS (
                 SELECT 1 FROM likes
@@ -28,28 +49,34 @@ class RankingController extends Controller
                 AND likes.user_id = ?
             ) as is_liked
         ", [$userId])
+
+        ->groupBy('rankings.id')
+
+        ->orderByDesc('recent_users')
+
         ->get();
 
     return response()->json(
-    $rankings->map(function ($ranking) {
+        $rankings->map(function ($ranking) {
 
-        return [
-            'id' => $ranking->id,
-            'title' => $ranking->title,
-            'reading' => $ranking->reading,
-            'is_liked' => $ranking->is_liked,
+            return [
+                'id' => $ranking->id,
+                'title' => $ranking->title,
+                'reading' => $ranking->reading,
+                'is_liked' => $ranking->is_liked,
+                'created_at' => $ranking->created_at,
+                'tags' => $ranking->tags->map(function ($tag) {
 
-            'tags' => $ranking->tags->map(function ($tag) {
-                return [
-                    'id' => $tag->id,
-                    'name' => $tag->name,
-                ];
-            }),
+                    return [
+                        'id' => $tag->id,
+                        'name' => $tag->name,
+                    ];
+                }),
 
-            'items' => [],
-        ];
-    })
-);
+                'items' => [],
+            ];
+        })
+    );
 }
 public function show($id)
 {
@@ -84,11 +111,12 @@ public function show($id)
         }),
     ]);
 }
-public function rowShow($id)
+public function rowShow($id,Request $request)
 {
     Log::info('RankingController@rowShow called');
-
+    $userId = $request->query('user_id');
     $ranking = Ranking::with(['items', 'user', 'tags'])->find($id);
+    
     if (!$ranking) {
         return response()->json([
             'message' => 'Ranking not found'
@@ -106,14 +134,26 @@ public function rowShow($id)
                 'name' => $tag->name,
             ];
         }),
-        'items' => $ranking->items->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'name' => $item->name,
-                'votes' => $item->votes,
-                'aliases' => $item->aliases,
-            ];
-        }),
+        'items' => $ranking->items->map(function ($item) use ($userId) {
+
+    $myVotes = Vote::where('ranking_item_id', $item->id)
+        ->where('user_identifier', $userId)
+        ->count();
+
+    $myVotesToday = Vote::where('ranking_item_id', $item->id)
+        ->where('user_identifier', $userId)
+        ->whereDate('vote_date', today())
+        ->count();
+
+    return [
+        'id' => $item->id,
+        'name' => $item->name,
+        'votes' => $item->votes,
+        'aliases' => $item->aliases,
+        'my_votes' => $myVotes,
+        'my_votes_today' => $myVotesToday,
+    ];
+}),
         'creator' => $ranking->user ? [
         'id' => $ranking->user->id,
         'user_name' => $ranking->user->user_name,
