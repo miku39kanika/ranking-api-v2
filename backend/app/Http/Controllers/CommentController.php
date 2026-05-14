@@ -6,7 +6,7 @@ use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-
+use App\Services\ContentFilterService;
 class CommentController extends Controller
 {
     /**
@@ -40,9 +40,15 @@ public function index(Request $request, $rankingId)
     /**
      * コメント投稿
      */
-    public function store(Request $request)
-    {
-        Log::info('CommentController@store called');
+    public function store(Request $request, ContentFilterService $filter)
+{
+    Log::info('CommentController@store called');
+    if ($filter->containsNgWord($request->body)) {
+        return response()->json([
+            'error' => 'NG_WORD'
+        ], 422);
+    }
+        
         $request->validate([
             'ranking_id' => 'required|integer',
             'user_id' => 'required|string',

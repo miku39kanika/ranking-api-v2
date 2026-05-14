@@ -24,6 +24,7 @@ class AuthController extends Controller
             Log::info('guestcreated called');
             $user = User::create([
     'id' => (string) Str::uuid(),
+    'public_id' => $this->generatePublicId(),
     'user_name' => '名無しのユーザー',
     'device_id' => $request->device_id,
     'email' => null,
@@ -94,6 +95,7 @@ $ranking->items()->createMany([
 Log::info('USER', ['user' => $user]);
         return response()->json([
     'id' => (string) $user->id,
+    'public_id' => $user->public_id,
     'user_name' => $user->user_name,
     'device_id' => $user->device_id,
     'email' => $user->email,
@@ -104,5 +106,23 @@ Log::info('USER', ['user' => $user]);
     'is_deleted' => $user->is_deleted,
     'banned_at' => $user->banned_at,
 ]);
+}
+private function generatePublicId(): string
+{
+    $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+    do {
+
+        $id = '';
+
+        for ($i = 0; $i < 10; $i++) {
+            $id .= $chars[random_int(0, strlen($chars) - 1)];
+        }
+
+    } while (
+        User::where('public_id', $id)->exists()
+    );
+
+    return $id;
 }
 }

@@ -55,6 +55,7 @@ Route::get('/announcements/{id}', [AnnouncementController::class, 'show']);
 Route::get('/gifts', [GiftController::class, 'index']);
 Route::post('/gifts/receive', [GiftController::class, 'receive']);
 Route::get('/items/my-icons', [ItemController::class, 'myIcons']);
+Route::get('/items/my-items', [ItemController::class, 'myItems']);
 Route::get('/items/{id}', [RankingItemController::class, 'show']);
 Route::post('/blocks', [BlockController::class, 'store']);
 Route::delete('/blocks/unblock', [BlockController::class, 'destroy']);

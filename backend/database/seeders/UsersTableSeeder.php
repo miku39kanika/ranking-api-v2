@@ -19,6 +19,7 @@ class UsersTableSeeder extends Seeder
         for ($i = 1; $i <= 10; $i++) {
             $users[] = [
                 'id' => sprintf('user_%02d', $i),
+                'public_id' => Str::random(10),
                 'user_name' => "ユーザー{$i}",
                 'device_id' => null,
                 'email' => null,
@@ -36,6 +37,7 @@ class UsersTableSeeder extends Seeder
         // 削除ユーザー
         $users[] = [
             'id' => 'user_del',
+            'public_id' => Str::random(10),
             'user_name' => '削除ユーザー',
             'device_id' => null,
             'email' => null,
@@ -52,6 +54,7 @@ class UsersTableSeeder extends Seeder
         // BANユーザー
         $users[] = [
             'id' => 'user_ban',
+            'public_id' => Str::random(10),
             'user_name' => 'BANユーザー',
             'device_id' => null,
             'email' => null,

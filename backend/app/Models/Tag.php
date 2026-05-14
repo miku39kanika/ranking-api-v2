@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Tag extends Model
 {
     protected $fillable = [
-        'name'
+        'name',
+        'tag_image_name',
+    
     ];
 
     public function rankings()

@@ -86,7 +86,7 @@ class RankingWithItemsSeeder extends Seeder
                     'title' => $title,
                     'reading' => null,
                     'tag' => "test,ranking,game",
-                    'image_name' => "img_" . rand(1, 10) . ".jpg",
+                    'image_name' => "sample1",
                     'is_item_add_limited' => rand(0, 1),
                     'daily_vote_limit' => rand(1, 3),
                     'total_vote_limit' => rand(5, 20),

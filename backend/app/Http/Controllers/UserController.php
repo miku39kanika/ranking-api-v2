@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Services\ContentFilterService;
 
 class UserController extends Controller
 {
@@ -23,6 +24,7 @@ class UserController extends Controller
 Log::info('USER', ['user' => $user]);
     return response()->json([
     'id' => (string) $user->id,
+    'public_id' => $user->public_id,
     'user_name' => $user->user_name,
     'device_id' => $user->device_id,
     'email' => $user->email,
@@ -35,9 +37,15 @@ Log::info('USER', ['user' => $user]);
 ]);
 }
 
-public function update(Request $request, $id)
+public function update(Request $request, $id, ContentFilterService $filter)
 {
     Log::info('UserController@update called');
+    if ($filter->containsNgWord($request->user_name) || $filter->containsNgWord($request->about_self)) {
+        return response()->json([
+            'error' => 'NG_WORD'
+        ], 422);
+    }
+
     $user = User::find($id);
 
     if (!$user) {

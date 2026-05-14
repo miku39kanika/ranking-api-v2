@@ -67,6 +67,15 @@ class ItemsTableSeeder extends Seeder
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
+                        [
+                'name' => 'ガチャチケ',
+                'description' => 'アイテム：いつか使えるようになる',
+                'type' => 'item',
+                'rarity' => 'common',
+                'image_name' => 'item01',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
         ]);
     }
 }

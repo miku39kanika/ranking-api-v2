@@ -9,6 +9,7 @@ use App\Models\Vote;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Services\ReadingService;
+use App\Services\ContentFilterService;
 
 class RankingController extends Controller
 {
@@ -72,6 +73,7 @@ public function index(Request $request)
                         'name' => $tag->name,
                     ];
                 }),
+                'image_name' => $ranking->image_name,
 
                 'items' => [],
             ];
@@ -164,9 +166,15 @@ public function rowShow($id,Request $request)
     ] : null,
     ]);
 }
-public function store(Request $request)
+public function store(Request $request, ContentFilterService $filter)
 {
     Log::info('RankingController@store called');
+    if ($filter->containsNgWord($request->title)) {
+        return response()->json([
+            'error' => 'NG_WORD'
+        ], 422);
+    }
+    
     $reading = app(ReadingService::class)->generate($request->title);
 
     $ranking = Ranking::create([
@@ -181,7 +189,13 @@ public function store(Request $request)
     ]);
 $ranking->tags()->sync($request->tag_ids);
 
-    return response()->json($ranking);
+    return response()->json([
+    'id' => $ranking->id,
+    'title' => $ranking->title,
+    'reading' => $ranking->reading,
+    'image_name' => $ranking->image_name,
+    'created_at' => $ranking->created_at,
+]);
 }
 
 public function random()

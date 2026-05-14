@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\RankingItem;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use App\Services\ContentFilterService;
 class RankingItemController extends Controller
 {
     public function show($id)
@@ -25,26 +27,36 @@ class RankingItemController extends Controller
             'aliases' => $item->aliases
         ]);
     }
-    public function store(Request $request)
+    public function store(Request $request, ContentFilterService $filter)
 {
+    Log::info('RankingItemController@store called');
+    if ($filter->containsNgWord($request->name)) {
+        return response()->json([
+            'error' => 'NG_WORD'
+        ], 422);
+    }
     $item = RankingItem::create([
         'ranking_id' => $request->ranking_id,
         'name' => $request->name,
         'votes' => 0,
         'aliases' => $request->aliases
     ]);
-    Log::info('RankingItemController@store called');
+    
     return response()->json($item);
 }
-public function addAlias(Request $request, $id)
+public function addAlias(Request $request, $id, ContentFilterService $filter)
 {
+    Log::info('RankingItemController@addAlias called');
+    if ($filter->containsNgWord($request->alias)) {
+        return response()->json([
+            'error' => 'NG_WORD'
+        ], 422);
+    }
     $item = RankingItem::find($id);
 
     if (!$item) {
         return response()->json(['message' => 'Item not found'], 404);
     }
-    Log::info('RankingItemController@addAlias called');
-
     $aliases = $item->aliases ?? [];
 
     // 重複防止（任意）

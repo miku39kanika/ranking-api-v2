@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\PersonalRanking;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Services\ContentFilterService;
 class PersonalRankingController extends Controller
 {
     public function show($userId)
@@ -25,9 +26,31 @@ class PersonalRankingController extends Controller
     return response()->json($ranking);
 }
 
-public function update(Request $request)
-{
-    Log::info('PersonalRankingController@update called');
+public function update(Request $request, ContentFilterService $filter)
+{ Log::info('PersonalRankingController@update called');
+    // =====================
+    // NGチェック（先に全部まとめて）
+    // =====================
+
+    if ($request->filled('title')) {
+        if ($filter->containsNgWord($request->title)) {
+            return response()->json(['error' => 'NG_WORD'], 422);
+        }
+    }
+
+    if (is_array($request->items)) {
+        foreach ($request->items as $item) {
+
+            if (!isset($item['word']) || $item['word'] === null) {
+                continue;
+            }
+
+            if ($filter->containsNgWord($item['word'])) {
+                return response()->json(['error' => 'NG_WORD'], 422);
+            }
+        }
+    }
+    
     $ranking = PersonalRanking::where(
         'user_id',
         $request->user_id

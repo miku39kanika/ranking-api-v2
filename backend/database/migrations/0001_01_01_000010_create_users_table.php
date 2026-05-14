@@ -13,6 +13,7 @@ return new class extends Migration
 {
     Schema::create('users', function (Blueprint $table) {
         $table->uuid('id')->primary();
+        $table->string('public_id', 12)->unique();
         $table->string('user_name')->nullable()->default('名無しのユーザー');
         $table->string('device_id')->nullable()->index();
         $table->string('email', 255)->nullable()->unique();
