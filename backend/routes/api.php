@@ -21,6 +21,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\ReportController;
 
+Route::get('/rankings/official-latest', [RankingController::class, 'officialLatest']);
 Route::get('/rankings', [RankingController::class, 'index']);
 Route::post('/vote', [VoteController::class, 'vote']);
 Route::get('/ranking/{id}', [RankingController::class, 'show']);
@@ -62,3 +63,4 @@ Route::delete('/blocks/unblock', [BlockController::class, 'destroy']);
 Route::get('/blocks/status', [BlockController::class, 'status']);
 Route::get('/blocks/{userId}', [BlockController::class, 'index']);
 Route::post('/reports', [ReportController::class, 'store']);
+Route::get('/users/public/{publicId}',[UserController::class, 'findByPublicId']);

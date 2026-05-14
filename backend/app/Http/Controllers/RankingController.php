@@ -20,14 +20,8 @@ public function index(Request $request)
     $userId = $request->query('user_id');
 
     $rankings = Ranking::with('tags')
-
-        ->leftJoin(
-            'votes',
-            'rankings.id',
-            '=',
-            'votes.ranking_id'
-        )
-
+    ->where('rankings.ranking_type', 0)
+    ->leftJoin('votes', 'rankings.id', '=', 'votes.ranking_id')
         ->select(
             'rankings.*',
             DB::raw('COUNT(DISTINCT votes.user_identifier) as recent_users')
@@ -83,7 +77,9 @@ public function index(Request $request)
 public function show($id)
 {
     Log::info('RankingController@show called');
-    $ranking = Ranking::with(['items', 'tags'])->find($id);
+    $ranking = Ranking::with(['items', 'tags'])
+    ->where('ranking_type', 0)
+    ->find($id);
 
     if (!$ranking) {
         return response()->json([
@@ -117,7 +113,8 @@ public function rowShow($id,Request $request)
 {
     Log::info('RankingController@rowShow called');
     $userId = $request->query('user_id');
-    $ranking = Ranking::with(['items', 'user', 'tags'])->find($id);
+    $ranking = Ranking::with(['items', 'user', 'tags'])
+    ->find($id);
     
     if (!$ranking) {
         return response()->json([
@@ -178,6 +175,7 @@ public function store(Request $request, ContentFilterService $filter)
     $reading = app(ReadingService::class)->generate($request->title);
 
     $ranking = Ranking::create([
+        'ranking_type' => 0,
         'title' => $request->title,
         'reading' => $reading,
         'image_name' => $request->image_name,
@@ -201,9 +199,9 @@ $ranking->tags()->sync($request->tag_ids);
 public function random()
 {
     $rankings = Ranking::with(['items' => function ($query) {
-        $query->orderByDesc('votes')
-              ->limit(5);
+        $query->orderByDesc('votes')->limit(5);
     }])
+    ->where('ranking_type', 0)
     ->inRandomOrder()
     ->limit(10) // ここは好みで3〜10くらい
     ->get();
@@ -214,11 +212,43 @@ public function random()
  public function getByUser($userId)
     {
         $rankings = Ranking::where('user_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->get();
+    ->where('ranking_type', 0)
+    ->orderBy('created_at', 'desc')
+    ->get();
         
         return response()->json($rankings);
     }
+
+    public function officialLatest(Request $request)
+{
+    Log::info('RankingController@officialLatest called');
+
+    $rankings = Ranking::with(['tags'])
+        ->where('ranking_type', 1)
+        ->orderBy('created_at', 'desc')
+        ->limit(2)
+        ->get();
+
+    return response()->json(
+        $rankings->map(function ($ranking) {
+            return [
+                'id' => $ranking->id,
+                'title' => $ranking->title,
+                'reading' => $ranking->reading,
+                'image_name' => $ranking->image_name,
+                'created_at' => $ranking->created_at,
+                'is_liked' => 0,
+                'tags' => $ranking->tags->map(function ($tag) {
+                    return [
+                        'id' => $tag->id,
+                        'name' => $tag->name,
+                    ];
+                }),
+                'items' => [],
+            ];
+        })
+    );
+}
 }
 
 

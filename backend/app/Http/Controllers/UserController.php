@@ -80,5 +80,28 @@ public function update(Request $request, $id, ContentFilterService $filter)
 return response()->json($user);
 }
 
+public function findByPublicId($publicId)
+    {
+        $user = User::where(
+            'public_id',
+            $publicId
+        )->first();
+
+        if (!$user) {
+
+            return response()->json([
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'id' => $user->id,
+            'public_id' => $user->public_id,
+            'user_name' => $user->user_name,
+            'icon_type' => $user->icon_type,
+            'icon_name' => $user->icon_name,
+            'about_self' => $user->about_self,
+        ]);
+    }
 
 }
