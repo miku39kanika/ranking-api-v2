@@ -19,19 +19,44 @@ public function index(Request $request)
     $sort = $request->query('sort', 'popular');
     $likedOnly = $request->query('liked_only');
     $query = Ranking::with('tags')
-    ->where('ranking_type', 0)
-    ->select('rankings.*');
-
+    ->where('ranking_type', 0);
 if ($userId) {
 
-    $query->selectRaw("
-        EXISTS (
-            SELECT 1
-            FROM likes
-            WHERE likes.ranking_id = rankings.id
-            AND likes.user_id = ?
-        ) as is_liked
-    ", [$userId]);
+    $query->where(function ($q) use ($userId) {
+
+        $q->where('vote_permission', '!=', 'invite_only_hidden')
+
+          ->orWhereExists(function ($sub) use ($userId) {
+
+              $sub->select(DB::raw(1))
+                  ->from('ranking_invites')
+                  ->whereColumn(
+                      'ranking_invites.ranking_id',
+                      'rankings.id'
+                  )
+                  ->where(
+                      'ranking_invites.user_id',
+                      $userId
+                  );
+          });
+    });
+
+} else {
+
+    $query->where(
+        'vote_permission',
+        '!=',
+        'invite_only_hidden'
+    );
+}
+if ($userId) {
+
+    $query->withExists([
+        'likes as is_liked' => function ($q) use ($userId) {
+
+            $q->where('user_id', $userId);
+        }
+    ]);
 }
 
 if ($likedOnly) {
@@ -52,11 +77,12 @@ if ($likedOnly) {
     } else {
 
         $query
-            ->leftJoin('votes', 'rankings.id', '=', 'votes.ranking_id')
-            ->select(
-                'rankings.*',
-                DB::raw('COUNT(DISTINCT votes.user_identifier) as recent_users')
-            )
+    ->leftJoin(
+        'votes',
+        'rankings.id',
+        '=',
+        'votes.ranking_id'
+    )
             ->where(function ($query) {
 
                 $query->where(
@@ -67,7 +93,10 @@ if ($likedOnly) {
                 ->orWhereNull('votes.id');
             })
             ->groupBy('rankings.id')
-            ->orderByDesc('recent_users');
+            ->orderByRaw(
+    'COUNT(DISTINCT votes.user_identifier) DESC'
+)
+->select('rankings.*');
     }
 
     $rankings = $query->paginate(20);
@@ -79,7 +108,7 @@ if ($likedOnly) {
                 'id' => $ranking->id,
                 'title' => $ranking->title,
                 'reading' => $ranking->reading,
-                'is_liked' => (int)$ranking->is_liked,
+                'is_liked' => (int)($ranking->is_liked ?? 0),
                 'created_at' => $ranking->created_at,
                 'tags' => $ranking->tags->map(function ($tag) {
 
@@ -96,13 +125,29 @@ if ($likedOnly) {
         'last_page' => $rankings->lastPage(),
     ]);
 }
-public function show($id)
+
+public function show($id, Request $request)
 {
     Log::info('RankingController@show called');
     $ranking = Ranking::with(['items', 'tags'])
     ->where('ranking_type', 0)
     ->find($id);
+$userId = $request->query('user_id');
 
+$isInvited = DB::table('ranking_invites')
+    ->where('ranking_id', $ranking->id)
+    ->where('user_id', $userId)
+    ->exists();
+
+if (
+    $ranking->vote_permission === 'invite_only_hidden'
+    && !$isInvited
+) {
+
+    return response()->json([
+        'message' => 'Forbidden'
+    ], 403);
+}
     if (!$ranking) {
         return response()->json([
             'message' => 'Ranking not found'
@@ -134,14 +179,32 @@ public function show($id)
 public function rowShow($id,Request $request)
 {
     Log::info('RankingController@rowShow called');
-    $userId = $request->query('user_id');
+   $userId = $request->query('user_id');
+
     $ranking = Ranking::with(['items', 'user', 'tags'])
-    ->find($id);
-    
+        ->find($id);
+
     if (!$ranking) {
+
         return response()->json([
             'message' => 'Ranking not found'
         ], 404);
+    }
+
+    $isInvited = DB::table('ranking_invites')
+        ->where('ranking_id', $ranking->id)
+        ->where('user_id', $userId)
+        ->exists();
+
+    // invite_only_hidden
+    if (
+        $ranking->vote_permission === 'invite_only_hidden'
+        && !$isInvited
+    ) {
+
+        return response()->json([
+            'message' => 'Forbidden'
+        ], 403);
     }
 
     return response()->json([
@@ -183,6 +246,10 @@ public function rowShow($id,Request $request)
         'about_self' => $ranking->user->about_self,
         'plan_type' => $ranking->user->plan_type,
     ] : null,
+    'can_vote' => (
+            $ranking->vote_permission === 'public_access'
+            || $isInvited
+        ),
     ]);
 }
 public function store(Request $request, ContentFilterService $filter)

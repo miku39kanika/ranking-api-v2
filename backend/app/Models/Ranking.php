@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\RankingItem;
 use App\Models\User;
 use App\Models\Comment;
-
+use App\Models\Like;
 class Ranking extends Model
 {protected $fillable = [
     'title',
@@ -27,7 +27,11 @@ class Ranking extends Model
 
 public function user()
 {
-    return $this->belongsTo(User::class);
+    return $this->belongsTo(
+    User::class,
+    'user_id',
+    'id'
+);
 }
 public function comments()
 {
@@ -36,5 +40,13 @@ public function comments()
 public function tags()
 {
     return $this->belongsToMany(Tag::class);
+}
+public function invites()
+{
+    return $this->hasMany(RankingInvite::class);
+}
+public function likes()
+{
+    return $this->hasMany(Like::class);
 }
 }
