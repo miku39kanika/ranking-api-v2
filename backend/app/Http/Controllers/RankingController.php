@@ -15,50 +15,71 @@ class RankingController extends Controller
 {
 public function index(Request $request)
 {
-    Log::info('RankingController@index called');
-
     $userId = $request->query('user_id');
+    $sort = $request->query('sort', 'popular');
+    $likedOnly = $request->query('liked_only');
+    $query = Ranking::with('tags')
+    ->where('ranking_type', 0)
+    ->select('rankings.*');
 
-    $rankings = Ranking::with('tags')
-    ->where('rankings.ranking_type', 0)
-    ->leftJoin('votes', 'rankings.id', '=', 'votes.ranking_id')
-        ->select(
-            'rankings.*',
-            DB::raw('COUNT(DISTINCT votes.user_identifier) as recent_users')
-        )
+if ($userId) {
 
-        ->where(function ($query) {
+    $query->selectRaw("
+        EXISTS (
+            SELECT 1
+            FROM likes
+            WHERE likes.ranking_id = rankings.id
+            AND likes.user_id = ?
+        ) as is_liked
+    ", [$userId]);
+}
 
-            $query->where(
-                'votes.created_at',
-                '>=',
-                now()->subDay()
+if ($likedOnly) {
+
+    $query->whereExists(function ($q) use ($userId) {
+
+        $q->select(DB::raw(1))
+            ->from('likes')
+            ->whereColumn('likes.ranking_id', 'rankings.id')
+            ->where('likes.user_id', $userId);
+    });
+}
+
+    if ($sort === 'newest') {
+
+        $query->orderByDesc('created_at');
+
+    } else {
+
+        $query
+            ->leftJoin('votes', 'rankings.id', '=', 'votes.ranking_id')
+            ->select(
+                'rankings.*',
+                DB::raw('COUNT(DISTINCT votes.user_identifier) as recent_users')
             )
-            ->orWhereNull('votes.id');
-        })
+            ->where(function ($query) {
 
-        ->selectRaw("
-            EXISTS (
-                SELECT 1 FROM likes
-                WHERE likes.ranking_id = rankings.id
-                AND likes.user_id = ?
-            ) as is_liked
-        ", [$userId])
+                $query->where(
+                    'votes.created_at',
+                    '>=',
+                    now()->subDay()
+                )
+                ->orWhereNull('votes.id');
+            })
+            ->groupBy('rankings.id')
+            ->orderByDesc('recent_users');
+    }
 
-        ->groupBy('rankings.id')
+    $rankings = $query->paginate(20);
 
-        ->orderByDesc('recent_users')
-
-        ->get();
-
-    return response()->json(
-        $rankings->map(function ($ranking) {
+    return response()->json([
+        'data' => $rankings->getCollection()->map(function ($ranking) use ($userId) {
 
             return [
                 'id' => $ranking->id,
                 'title' => $ranking->title,
                 'reading' => $ranking->reading,
-                'is_liked' => $ranking->is_liked,
+                'is_liked' => (int)$ranking->is_liked,
                 'created_at' => $ranking->created_at,
                 'tags' => $ranking->tags->map(function ($tag) {
 
@@ -68,11 +89,12 @@ public function index(Request $request)
                     ];
                 }),
                 'image_name' => $ranking->image_name,
-
                 'items' => [],
             ];
-        })
-    );
+        }),
+        'current_page' => $rankings->currentPage(),
+        'last_page' => $rankings->lastPage(),
+    ]);
 }
 public function show($id)
 {
