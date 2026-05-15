@@ -15,7 +15,7 @@ class RankingController extends Controller
 {
 public function index(Request $request)
 {
-    $userId = $request->query('user_id');
+    $userId = $request->user()->id;
     $sort = $request->query('sort', 'popular');
     $likedOnly = $request->query('liked_only');
     $query = Ranking::with('tags')
@@ -25,7 +25,7 @@ if ($userId) {
     $query->where(function ($q) use ($userId) {
 
         $q->where('vote_permission', '!=', 'invite_only_hidden')
-
+          ->orWhere('user_id', $userId)
           ->orWhereExists(function ($sub) use ($userId) {
 
               $sub->select(DB::raw(1))
@@ -132,6 +132,11 @@ public function show($id, Request $request)
     $ranking = Ranking::with(['items', 'tags'])
     ->where('ranking_type', 0)
     ->find($id);
+    if (!$ranking) {
+    return response()->json([
+        'message' => 'Ranking not found'
+    ], 404);
+}
 $userId = $request->query('user_id');
 
 $isInvited = DB::table('ranking_invites')
@@ -139,9 +144,12 @@ $isInvited = DB::table('ranking_invites')
     ->where('user_id', $userId)
     ->exists();
 
+$isOwner = $ranking->user_id === $userId;
+
 if (
     $ranking->vote_permission === 'invite_only_hidden'
     && !$isInvited
+    && !$isOwner
 ) {
 
     return response()->json([
@@ -179,7 +187,7 @@ if (
 public function rowShow($id,Request $request)
 {
     Log::info('RankingController@rowShow called');
-   $userId = $request->query('user_id');
+   $userId = $request->user()->id;
 
     $ranking = Ranking::with(['items', 'user', 'tags'])
         ->find($id);
@@ -195,12 +203,13 @@ public function rowShow($id,Request $request)
         ->where('ranking_id', $ranking->id)
         ->where('user_id', $userId)
         ->exists();
+$isOwner = $ranking->user_id === $userId;
 
-    // invite_only_hidden
-    if (
-        $ranking->vote_permission === 'invite_only_hidden'
-        && !$isInvited
-    ) {
+if (
+    $ranking->vote_permission === 'invite_only_hidden'
+    && !$isInvited
+    && !$isOwner
+) {
 
         return response()->json([
             'message' => 'Forbidden'
@@ -247,9 +256,16 @@ public function rowShow($id,Request $request)
         'plan_type' => $ranking->user->plan_type,
     ] : null,
     'can_vote' => (
-            $ranking->vote_permission === 'public_access'
-            || $isInvited
-        ),
+    $ranking->vote_permission === 'public_access'
+    || $ranking->user_id === $userId
+    || (
+        in_array(
+            $ranking->vote_permission,
+            ['invite_only_view', 'invite_only_hidden']
+        )
+        && $isInvited
+    )
+),
     ]);
 }
 public function store(Request $request, ContentFilterService $filter)
@@ -272,7 +288,7 @@ public function store(Request $request, ContentFilterService $filter)
         'daily_vote_limit' => $request->daily_vote_limit,
         'total_vote_limit' => $request->total_vote_limit,
         'vote_permission' => $request->vote_permission,
-        'user_id' => $request->user_id,
+        'user_id' => $request->user()->id,
     ]);
 $ranking->tags()->sync($request->tag_ids);
 

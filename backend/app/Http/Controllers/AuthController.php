@@ -90,10 +90,16 @@ $ranking->items()->createMany([
         ]
     );
 }
+        }else{
+            $user->tokens()->delete();
+
         }
 // 🔥 ログ出力
 Log::info('USER', ['user' => $user]);
+    $token = $user->createToken('ios-device:' . $request->device_id)->plainTextToken;
         return response()->json([
+        'token' => $token,
+        'user' => [
     'id' => (string) $user->id,
     'public_id' => $user->public_id,
     'user_name' => $user->user_name,
@@ -105,8 +111,10 @@ Log::info('USER', ['user' => $user]);
     'about_self' => $user->about_self,
     'is_deleted' => $user->is_deleted,
     'banned_at' => $user->banned_at,
+    ]
 ]);
 }
+
 private function generatePublicId(): string
 {
     $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';

@@ -14,7 +14,7 @@ class ItemController extends Controller
 public function myIcons(Request $request)
 {
     Log::info('ItemController@myIcons called');
-    $userId = $request->user_id;
+    $userId = $request->user()->id;
 
     $items = DB::table('user_items')
         ->join('items', 'user_items.item_id', '=', 'items.id')
@@ -33,7 +33,7 @@ public function myIcons(Request $request)
 public function myItems(Request $request)
 {
     Log::info('ItemController@myItems called');
-    $userId = $request->user_id;
+    $userId = $request->user()->id;
 
     $items = DB::table('user_items')
         ->join('items', 'user_items.item_id', '=', 'items.id')

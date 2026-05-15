@@ -16,7 +16,7 @@ public function index(Request $request, $rankingId)
 {
     Log::info('CommentController@index called');
 
-    $userId = $request->user_id;
+    $userId = $request->user()->id;
 
     // ブロック中ユーザー取得
     $blockedUserIds = DB::table('blocks')
@@ -51,13 +51,12 @@ public function index(Request $request, $rankingId)
         
         $request->validate([
             'ranking_id' => 'required|integer',
-            'user_id' => 'required|string',
             'body' => 'required|string|max:200',
         ]);
 
         $comment = Comment::create([
             'ranking_id' => $request->ranking_id,
-            'user_id' => $request->user_id,
+            'user_id' => $request->user()->id,
             'body' => $request->body,
         ]);
 

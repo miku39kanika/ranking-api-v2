@@ -11,11 +11,15 @@ use Illuminate\Support\Facades\Log;
     
 class GiftController extends Controller
 {
-    public function index()
+    public function index(Request $request)
 {
     Log::info('GiftController@index called');
-    $userId = request('user_id');
-    $from = request('from');
+
+    $user = $request->user();
+    $userId = $user->id;
+
+    // ★ここを user()->created_at に置き換え
+    $from = $user->created_at->format('Y-m-d');
 
     $query = Gift::query();
 
@@ -32,63 +36,55 @@ class GiftController extends Controller
     // =====================
     $query->where(function ($q) use ($userId, $from) {
 
-        // case 1：全員
         $q->orWhere('case', 1);
 
-        // case 2：全員 + from
-        if ($from) {
-            $q->orWhere(function ($sub) use ($from) {
-                $sub->where('case', 2)
-                    ->whereDate('from_date', '>=', $from);
-            });
-        }
+        $q->orWhere(function ($sub) use ($from) {
+            $sub->where('case', 2)
+                ->whereDate('from_date', '>=', $from);
+        });
 
-        // case 3：個別
-        if ($userId) {
-            $q->orWhere(function ($sub) use ($userId) {
-                $sub->where('case', 3)
-                    ->where('user_id', $userId);
-            });
-        }
+        $q->orWhere(function ($sub) use ($userId) {
+            $sub->where('case', 3)
+                ->where('user_id', $userId);
+        });
     });
 
     $gifts = $query->latest()->get();
 
-    // =====================
-    // ★ここが追加ポイント
-    // user_giftsを参照してフラグ付け
-    // =====================
-
+    Log::info('GIFTS DEBUG', [
+    'user_id' => $userId,
+    'from' => $from,
+    'gifts_count' => $gifts->count(),
+    'gift_ids' => $gifts->pluck('id'),
+    'gift_users' => $gifts->pluck('user_id'),
+]);
     $receivedGiftIds = DB::table('user_gifts')
         ->where('user_id', $userId)
         ->pluck('gift_id')
         ->toArray();
 
-    $gifts = $gifts->map(function ($gift) use ($receivedGiftIds) {
-        $gift->is_received = in_array($gift->id, $receivedGiftIds);
-        return $gift;
-    });
-
     return response()->json(
-    $gifts->map(function ($gift) use ($receivedGiftIds) {
-        return [
-            'id' => $gift->id,
-            'title' => $gift->title,
-            'body' => $gift->body,
-            'case' => $gift->case,
-            'user_id' => $gift->user_id,
-            'from_date' => $gift->from_date,
-            'expires_at' => $gift->expires_at,
-            'created_at' => $gift->created_at,
-            'is_received' => in_array($gift->id, $receivedGiftIds),
-        ];
-    })
-);
+        $gifts->map(function ($gift) use ($receivedGiftIds) {
+            return [
+                'id' => $gift->id,
+                'title' => $gift->title,
+                'body' => $gift->body,
+                'case' => $gift->case,
+                'user_id' => $gift->user_id,
+                'from_date' => $gift->from_date,
+                'expires_at' => $gift->expires_at,
+                'created_at' => $gift->created_at,
+                'is_received' => in_array($gift->id, $receivedGiftIds),
+            ];
+        })
+    );
 }
+
+
 public function receive(Request $request)
 {
     Log::info('GiftController@receive called');
-    $userId = $request->user_id;
+    $userId = $request->user()->id;
     $giftId = $request->gift_id;
 
     // =====================

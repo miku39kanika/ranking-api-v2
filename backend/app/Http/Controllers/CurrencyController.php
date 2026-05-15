@@ -9,29 +9,32 @@ use App\Models\CurrencyHistory;
 use Illuminate\Support\Facades\Log;
 class CurrencyController extends Controller
 {
-    public function index($userId)
-    {
-        Log::info('CurrencyController@index called');
-        $currencies = UserCurrency::with('currency')
-            ->where('user_id', $userId)
-            ->get();
+    public function index(Request $request)
+{
+    Log::info('CurrencyController@index called');
+    Log::info('USER CHECK', [
+    'auth' => $request->user(),
+    'header' => $request->header('Authorization')
+]);
+    $userId = $request->user()->id;
+    $currencies = UserCurrency::with('currency')
+        ->where('user_id', $userId)
+        ->get();
 
-        $result = $currencies->map(function ($item) {
-            return [
-                'code' => $item->currency->code,
-                'name' => $item->currency->name,
-                'amount' => $item->amount,
-            ];
-        });
-
-        return response()->json($result);
-    }
+    return response()->json($currencies->map(function ($item) {
+        return [
+            'code' => $item->currency->code,
+            'name' => $item->currency->name,
+            'amount' => $item->amount,
+        ];
+    }));
+}
 
     public function change(Request $request)
 {
     Log::info('CurrencyController@change called');
     $userCurrency = UserCurrency::with('currency')
-        ->where('user_id', $request->user_id)
+        ->where('user_id', $request->user()->id)
         ->whereHas('currency', function ($q) use ($request) {
             $q->where('code', $request->code);
         })
@@ -56,7 +59,7 @@ class CurrencyController extends Controller
     $userCurrency->save();
 
     CurrencyHistory::create([
-        'user_id' => $request->user_id,
+        'user_id' => $request->user()->id,
         'currency_id' => $userCurrency->currency_id,
         'amount' => $request->amount,
         'reason' => 'API change',

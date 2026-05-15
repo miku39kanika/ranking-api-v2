@@ -50,10 +50,10 @@ public function update(Request $request, ContentFilterService $filter)
             }
         }
     }
-    
+
     $ranking = PersonalRanking::where(
         'user_id',
-        $request->user_id
+        $request->user()->id
     )->first();
 
     if (!$ranking) {

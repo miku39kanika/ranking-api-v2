@@ -16,7 +16,7 @@ class LikeController extends Controller
             'ranking_id' => 'required',
         ]);
 
-        $like = Like::where('user_id', $request->user_id)
+        $like = Like::where('user_id', $request->user()->id)
             ->where('ranking_id', $request->ranking_id)
             ->first();
 
@@ -31,7 +31,7 @@ class LikeController extends Controller
 
         // なければ作成（いいね）
         Like::create([
-            'user_id' => $request->user_id,
+            'user_id' => $request->user()->id,
             'ranking_id' => $request->ranking_id,
         ]);
 
@@ -41,12 +41,12 @@ class LikeController extends Controller
     }
 
     // 📦 ユーザーのいいね一覧
-    public function index($user_id)
-    {
-        Log::info('LikeController@index called');
-        $likes = Like::where('user_id', $user_id)
-            ->pluck('ranking_id');
+    // public function index($user_id)
+    // {
+    //     Log::info('LikeController@index called');
+    //     $likes = Like::where('user_id', $user_id)
+    //         ->pluck('ranking_id');
 
-        return response()->json($likes);
-    }
+    //     return response()->json($likes);
+    // }
 }

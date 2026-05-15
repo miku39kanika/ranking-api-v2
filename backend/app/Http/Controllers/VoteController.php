@@ -19,7 +19,7 @@ public function vote(Request $request)
     Log::info('VoteController@vote called');
 
     $itemId = $request->input('item_id');
-    $userId = $request->input('user_id');
+    $userId = $request->user()->id;
     $today = now()->toDateString();
 
     // item取得（ranking_limit見るため）
@@ -69,6 +69,7 @@ public function vote(Request $request)
         'queued' => true
     ]);
 }
+
 public function votedRankings($userId)
 {
     $votes = Vote::where(

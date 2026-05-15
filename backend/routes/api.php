@@ -6,7 +6,6 @@ use App\Http\Controllers\RankingItemController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LikeController;
-use App\Http\Controllers\LoginController;
 use App\Http\Controllers\VoteController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FollowController;
@@ -21,46 +20,55 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\ReportController;
 
-Route::get('/rankings/official-latest', [RankingController::class, 'officialLatest']);
-Route::get('/rankings', [RankingController::class, 'index']);
+Route::middleware('auth:sanctum')->group(function () {
+Route::post('/blocks', [BlockController::class, 'store']);
+Route::delete('/blocks/unblock', [BlockController::class, 'destroy']);
+Route::get('/blocks/status', [BlockController::class, 'status']);
+Route::get('/blocks', [BlockController::class, 'index']);
+Route::post('/reports', [ReportController::class, 'store']);
+Route::post('/comments', [CommentController::class, 'store']);
+Route::get('/comments/{ranking_id}', [CommentController::class, 'index']);
+Route::get('/currencies', [CurrencyController::class, 'index']);
+Route::post('/currency/change', [CurrencyController::class, 'change']);
+Route::get('/gifts', [GiftController::class, 'index']);
+Route::post('/gifts/receive', [GiftController::class, 'receive']);
+Route::get('/items/my-icons', [ItemController::class, 'myIcons']);
+Route::get('/items/my-items', [ItemController::class, 'myItems']);
+Route::post('/likes/toggle', [LikeController::class, 'toggle']);
+Route::put('/personal-ranking/update', [PersonalRankingController::class, 'update']);
+Route::post('/rankings', [RankingController::class, 'store']);
+Route::get('/ranking/row/{id}', [RankingController::class, 'rowShow']);
 Route::post('/vote', [VoteController::class, 'vote']);
+Route::get('/rankings', [RankingController::class, 'index']);
+});
+
+//sanctum認証不要なルート
+Route::get('/personal-ranking/{userId}', [PersonalRankingController::class, 'show']);
+Route::get('/users/{userId}/voted-rankings',[VoteController::class, 'votedRankings']);
+
+
+
+Route::get('/rankings/official-latest', [RankingController::class, 'officialLatest']);
 Route::get('/ranking/{id}', [RankingController::class, 'show']);
 Route::post('/items', [RankingItemController::class, 'store']);
-Route::post('/rankings', [RankingController::class, 'store']);
 Route::post('/items/{id}/alias', [RankingItemController::class, 'addAlias']);
 Route::delete('/items/{id}/alias/{alias}', [RankingItemController::class, 'deleteAlias']);
 Route::post('/auth/guest', [AuthController::class, 'guestLogin']);
 Route::get('/users/{device_id}', [UserController::class, 'show']);
-Route::post('/likes/toggle', [LikeController::class, 'toggle']);
-Route::get('/likes/{user_id}', [LikeController::class, 'index']);
-Route::get('/ranking/row/{id}', [RankingController::class, 'rowShow']);
 Route::put('/users/{id}', [UserController::class, 'update']);
 Route::get('/random-rankings', [RankingController::class, 'random']);
-Route::post('/comments', [CommentController::class, 'store']);
-Route::get('/comments/{ranking_id}', [CommentController::class, 'index']);
 Route::post('/follow', [FollowController::class, 'follow']);
 Route::get('/follow/counts/{userId}', [FollowController::class, 'counts']);
 Route::get('/follow/followings/{userId}', [FollowController::class, 'followings']);
 Route::get('/follow/followers/{userId}', [FollowController::class, 'followers']);
 Route::get('/game/session', [GameController::class, 'getSession']);
 Route::get('/rankings/user/{userId}', [RankingController::class, 'getByUser']);
-Route::get('/users/{userId}/currencies',[CurrencyController::class, 'index']);
-Route::post('/currency/change', [CurrencyController::class, 'change']);
 Route::get('/tags', [TagController::class, 'index']);
-Route::get('/personal-ranking/{userId}', [PersonalRankingController::class, 'show']);
-Route::put('/personal-ranking', [PersonalRankingController::class, 'update']);
-Route::get('/users/{userId}/voted-rankings',[VoteController::class, 'votedRankings']);
 Route::get('/app/status', [AppController::class, 'status']);
 Route::get('/announcements', [AnnouncementController::class, 'index']);
 Route::get('/announcements/{id}', [AnnouncementController::class, 'show']);
-Route::get('/gifts', [GiftController::class, 'index']);
-Route::post('/gifts/receive', [GiftController::class, 'receive']);
-Route::get('/items/my-icons', [ItemController::class, 'myIcons']);
-Route::get('/items/my-items', [ItemController::class, 'myItems']);
 Route::get('/items/{id}', [RankingItemController::class, 'show']);
-Route::post('/blocks', [BlockController::class, 'store']);
-Route::delete('/blocks/unblock', [BlockController::class, 'destroy']);
-Route::get('/blocks/status', [BlockController::class, 'status']);
-Route::get('/blocks/{userId}', [BlockController::class, 'index']);
-Route::post('/reports', [ReportController::class, 'store']);
 Route::get('/users/public/{publicId}',[UserController::class, 'findByPublicId']);
+
+
+

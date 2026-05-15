@@ -13,9 +13,11 @@ class BlockController extends Controller
     // =====================
     // ブロック
     // =====================
-public function index($userId)
+public function index(Request $request)
 {
     Log::info('BlockController@index called');
+
+    $userId = $request->user()->id;
 
     $blockedUserIds = Block::where('user_id', $userId)
         ->pluck('blocked_user_id');
@@ -24,10 +26,11 @@ public function index($userId)
         'blocked_user_ids' => $blockedUserIds
     ]);
 }
+
     public function store(Request $request)
     {
         Log::info('BlockController@store called');
-        $userId = $request->user_id;
+        $userId = $request->user()->id;
 
         $blockedUserId = $request->blocked_user_id;
 
@@ -74,7 +77,7 @@ public function index($userId)
     public function destroy(Request $request)
     {
         Log::info('BlockController@destroy called');
-        Block::where('user_id', $request->user_id)
+        Block::where('user_id', $request->user()->id)
             ->where('blocked_user_id', $request->blocked_user_id)
             ->delete();
 
@@ -86,10 +89,11 @@ public function index($userId)
     public function status(Request $request)
 {
     Log::info('BlockController@status called');
-    $userId = $request->query('user_id');
+
+    $userId = $request->user()->id;
     $blockedUserId = $request->query('blocked_user_id');
 
-    if (!$userId || !$blockedUserId) {
+    if (!$blockedUserId) {
         return response()->json([
             'is_blocked' => false
         ], 400);
