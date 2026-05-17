@@ -14,7 +14,7 @@ return new class extends Migration
     Schema::create('users', function (Blueprint $table) {
         $table->uuid('id')->primary();
         $table->string('public_id', 12)->unique();
-        $table->string('user_name')->nullable()->default('名無しのユーザー');
+        $table->string('user_name',15)->nullable()->default('名無しのユーザー');
         $table->string('device_id')->nullable()->index();
         $table->string('email', 255)->nullable()->unique();
         // 👇 ユーザー区分（課金ランク）
@@ -25,7 +25,7 @@ return new class extends Migration
         // 3: 管理者（とかでもOK）
         $table->string('icon_type')->nullable()->default('system');
         $table->string('icon_name')->nullable()->default('person.circle');
-        $table->text('about_self');
+        $table->text('about_self',60)->nullable();
         // 👇 論理削除
         $table->boolean('is_deleted')->default(false);
         // 👇 BAN関連 

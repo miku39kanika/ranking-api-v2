@@ -13,7 +13,7 @@ class FollowController extends Controller
 public function follow(Request $request)
 {
     Log::info('FollowController@follow called');
-    $me = $request->input('user_id');
+    $me = $request->user()->id;
     $target = $request->input('target_id');
 
     if ($me === $target) {

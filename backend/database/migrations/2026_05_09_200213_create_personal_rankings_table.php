@@ -16,7 +16,7 @@ return new class extends Migration
 
     $table->string('user_id')->unique();
 
-    $table->string('title')->nullable();
+    $table->string('title', 30)->nullable();
 
     $table->timestamps();
 });

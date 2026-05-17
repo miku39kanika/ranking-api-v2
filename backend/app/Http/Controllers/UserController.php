@@ -37,16 +37,20 @@ Log::info('USER', ['user' => $user]);
 ]);
 }
 
-public function update(Request $request, $id, ContentFilterService $filter)
+public function update(Request $request, ContentFilterService $filter)
 {
     Log::info('UserController@update called');
+    $request->validate([
+    'user_name' => 'nullable|string|max:15',
+    'about_self' => 'nullable|string|max:60',
+]);
     if ($filter->containsNgWord($request->user_name) || $filter->containsNgWord($request->about_self)) {
         return response()->json([
             'error' => 'NG_WORD'
         ], 422);
     }
 
-    $user = User::find($id);
+    $user = User::find($request->user()->id);
 
     if (!$user) {
         return response()->json([

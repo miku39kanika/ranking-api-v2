@@ -28,10 +28,21 @@ class PersonalRankingController extends Controller
 
 public function update(Request $request, ContentFilterService $filter)
 { Log::info('PersonalRankingController@update called');
+
+// バリデーション
+$request->validate([
+    'title' => 'nullable|string|max:30',
+
+    'items' => 'nullable|array',
+
+    'items.*.word' => 'nullable|string|max:15',
+
+    'items.*.rank' => 'required|integer',
+]);
+
     // =====================
     // NGチェック（先に全部まとめて）
     // =====================
-
     if ($request->filled('title')) {
         if ($filter->containsNgWord($request->title)) {
             return response()->json(['error' => 'NG_WORD'], 422);

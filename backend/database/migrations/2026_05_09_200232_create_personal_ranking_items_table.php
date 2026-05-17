@@ -20,7 +20,7 @@ return new class extends Migration
 
     $table->integer('rank');
 
-    $table->string('word');
+    $table->string('word', 15);
 
     $table->timestamps();
 });

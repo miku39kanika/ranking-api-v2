@@ -15,11 +15,44 @@ class RankingController extends Controller
 {
 public function index(Request $request)
 {
+    $request->validate([
+    'search' => 'nullable|string|max:50',
+]);
     $userId = $request->user()->id;
     $sort = $request->query('sort', 'popular');
     $likedOnly = $request->query('liked_only');
     $query = Ranking::with('tags')
     ->where('ranking_type', 0);
+    $search = $request->query('search');
+
+if ($search) {
+
+    $query->where(function ($q) use ($search) {
+
+        // タイトル検索
+        $q->where('title', 'like', "%{$search}%")
+
+        // タグ検索
+        ->orWhereHas('tags', function ($tagQuery) use ($search) {
+
+            $tagQuery->where(
+                'name',
+                'like',
+                "%{$search}%"
+            );
+        })
+
+        // 項目検索
+        ->orWhereHas('items', function ($itemQuery) use ($search) {
+
+            $itemQuery->where(
+                'name',
+                'like',
+                "%{$search}%"
+            );
+        });
+    });
+}
 if ($userId) {
 
     $query->where(function ($q) use ($userId) {
@@ -271,6 +304,11 @@ if (
 public function store(Request $request, ContentFilterService $filter)
 {
     Log::info('RankingController@store called');
+    $request->validate([
+    'title' => 'required|string|max:30',
+    'daily_vote_limit' => 'required|integer|min:1|max:100',
+    'total_vote_limit' => 'required|integer|min:1|max:1000',
+]);
     if ($filter->containsNgWord($request->title)) {
         return response()->json([
             'error' => 'NG_WORD'

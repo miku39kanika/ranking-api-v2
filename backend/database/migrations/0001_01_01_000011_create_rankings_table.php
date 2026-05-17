@@ -14,8 +14,8 @@ return new class extends Migration
     Schema::create('rankings', function (Blueprint $table) {
         $table->id();
         $table->tinyInteger('ranking_type')->default(0);
-        $table->string('title',60); // ランキング名
-        $table->string('reading',50)->nullable();
+        $table->string('title',30); // ランキング名
+        $table->string('reading')->nullable();
         $table->string('tag',100)->nullable();
         $table->string('image_name')->nullable();
         $table->boolean('is_item_add_limited')->default(false);
