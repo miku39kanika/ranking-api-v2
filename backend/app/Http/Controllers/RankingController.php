@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Services\ReadingService;
 use App\Services\ContentFilterService;
+use Illuminate\Support\Str;
 
 class RankingController extends Controller
 {
@@ -238,16 +239,16 @@ public function rowShow($id,Request $request)
         ->exists();
 $isOwner = $ranking->user_id === $userId;
 
-if (
-    $ranking->vote_permission === 'invite_only_hidden'
-    && !$isInvited
-    && !$isOwner
-) {
+// if (
+//     $ranking->vote_permission === 'invite_only_hidden'
+//     && !$isInvited
+//     && !$isOwner
+// ) {
 
-        return response()->json([
-            'message' => 'Forbidden'
-        ], 403);
-    }
+//         return response()->json([
+//             'message' => 'Forbidden'
+//         ], 403);
+//     }
 
     return response()->json([
         'id' => $ranking->id,
@@ -299,6 +300,7 @@ if (
         && $isInvited
     )
 ),
+'invite_code' => $ranking->invite_code,
     ]);
 }
 public function store(Request $request, ContentFilterService $filter)
@@ -316,7 +318,8 @@ public function store(Request $request, ContentFilterService $filter)
     }
     
     $reading = app(ReadingService::class)->generate($request->title);
-
+    $inviteCode =
+    Str::upper(Str::random(8));
     $ranking = Ranking::create([
         'ranking_type' => 0,
         'title' => $request->title,
@@ -327,6 +330,7 @@ public function store(Request $request, ContentFilterService $filter)
         'total_vote_limit' => $request->total_vote_limit,
         'vote_permission' => $request->vote_permission,
         'user_id' => $request->user()->id,
+        'invite_code' => $inviteCode,
     ]);
 $ranking->tags()->sync($request->tag_ids);
 
@@ -368,6 +372,7 @@ public function random()
 
     $rankings = Ranking::with(['tags'])
         ->where('ranking_type', 1)
+        ->where('vote_permission', '!=', 'invite_only_hidden')
         ->orderBy('created_at', 'desc')
         ->limit(2)
         ->get();
@@ -391,6 +396,44 @@ public function random()
             ];
         })
     );
+}
+public function showByInviteCode($inviteCode, Request $request)
+{
+    $userId = $request->user()->id;
+
+    $ranking = Ranking::with(['tags', 'items'])
+        ->where('invite_code', $inviteCode)
+        ->first();
+
+    if (!$ranking) {
+        return response()->json([
+            'message' => 'Ranking not found'
+        ], 404);
+    }
+
+    return response()->json([
+
+                'id' => $ranking->id,
+                'title' => $ranking->title,
+                'reading' => $ranking->reading,
+                'image_name' => $ranking->image_name,
+                'created_at' => $ranking->created_at,
+                'is_liked' => 0,
+                'tags' => $ranking->tags->map(function ($tag) {
+                    return [
+                        'id' => $tag->id,
+                        'name' => $tag->name,
+                    ];
+                }),
+                'items' => $ranking->items->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'votes' => $item->votes,
+                        'aliases' => $item->aliases,
+                    ];
+                }),
+    ]);
 }
 }
 

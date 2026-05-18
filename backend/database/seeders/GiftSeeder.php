@@ -14,8 +14,8 @@ class GiftSeeder extends Seeder
         // case 1：全員・常時（currency）
         // =====================
         Gift::create([
-            'title' => 'ログインボーナス',
-            'body' => "全ユーザーにオーブ×100を配布しました。",
+            'title' => 'DLありがとうございます！',
+            'body' => "このアプリをDLしてくださりありがとうございます。オーブ×100のプレゼントとなります。",
             'case' => 1,
             'user_id' => null,
 
@@ -27,17 +27,17 @@ class GiftSeeder extends Seeder
             'expires_at' => Carbon::now()->addDays(30),
         ]);
         // =====================
-        // case 1(二つ目)：全員・常時（currency）
+        // case 1(二つ目)：全員・常時（item）
         // =====================
         Gift::create([
-            'title' => 'ログインボーナス',
-            'body' => "全ユーザーにオーブ×222を配布しました。",
+            'title' => 'DLありがとうございます！',
+            'body' => "このアプリをDLしてくださりありがとうございます。限定アイコンのプレゼントとなります。",
             'case' => 1,
             'user_id' => null,
 
-            'reward_type' => 'currency',
-            'reward_code' => 1,
-            'reward_amount' => 222,
+            'reward_type' => 'item',
+            'reward_code' => 6,
+            'reward_amount' => 1,
 
             'from_date' => null,
             'expires_at' => Carbon::now()->addDays(30),
@@ -92,23 +92,6 @@ class GiftSeeder extends Seeder
 
             'from_date' => null,
             'expires_at' => Carbon::now()->addDays(14),
-        ]);
-
-                // =====================
-        // case 4：全員・常時（item）
-        // =====================
-        Gift::create([
-            'title' => 'ログインボーナス',
-            'body' => "全ユーザーに伝説のアイコンを配布しました。",
-            'case' => 1,
-            'user_id' => null,
-
-            'reward_type' => 'item',
-            'reward_code' => 6,
-            'reward_amount' => 1,
-
-            'from_date' => null,
-            'expires_at' => Carbon::now()->addDays(30),
         ]);
     }
 }

@@ -18,6 +18,7 @@ class Ranking extends Model
     'total_vote_limit',
     'vote_permission',
     'user_id',
+    'invite_code'
 ];
 
     public function items()

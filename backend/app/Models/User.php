@@ -20,6 +20,7 @@ class User extends Authenticatable
     protected $fillable = [
         'id',
         'public_id',
+        'invite_code',
         'device_id',
         'email',
         'plan_type',
@@ -29,7 +30,8 @@ class User extends Authenticatable
         'icon_name',
         'user_name',
         'about_self',
-        'point_stone'
+        'point_stone',
+        'invited_by',
     ];
 
     protected $hidden = [

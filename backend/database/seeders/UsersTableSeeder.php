@@ -20,6 +20,7 @@ class UsersTableSeeder extends Seeder
             $users[] = [
                 'id' => sprintf('user_%02d', $i),
                 'public_id' => Str::random(10),
+                'invite_code' => Str::random(10),
                 'user_name' => "ユーザー{$i}",
                 'device_id' => null,
                 'email' => null,
@@ -38,6 +39,7 @@ class UsersTableSeeder extends Seeder
         $users[] = [
             'id' => 'user_del',
             'public_id' => Str::random(10),
+            'invite_code' => Str::random(10),
             'user_name' => '削除ユーザー',
             'device_id' => null,
             'email' => null,
@@ -55,6 +57,7 @@ class UsersTableSeeder extends Seeder
         $users[] = [
             'id' => 'user_ban',
             'public_id' => Str::random(10),
+            'invite_code' => Str::random(10),
             'user_name' => 'BANユーザー',
             'device_id' => null,
             'email' => null,
@@ -70,6 +73,7 @@ class UsersTableSeeder extends Seeder
           $users[] = [
                 'id' => "user_99",
                 'public_id' => 0000000000,
+                'invite_code' => 0000000000,
                 'user_name' => "公式太郎",
                 'device_id' => null,
                 'email' => null,

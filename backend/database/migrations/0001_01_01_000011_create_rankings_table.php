@@ -21,8 +21,11 @@ return new class extends Migration
         $table->boolean('is_item_add_limited')->default(false);
         $table->integer('daily_vote_limit')->default(1);
         $table->integer('total_vote_limit')->default(10);
-        $table->string('vote_permission',30)->default('publicAccess');
+        $table->string('vote_permission',30)->default('publicAccess');//'public_access','invite_only_view', 'invite_only_hidden'
         $table->uuid('user_id');
+        $table->string('invite_code', 8)
+    ->unique()
+    ->nullable();
         $table->timestamps();
         
     });

@@ -30,7 +30,10 @@ return new class extends Migration
         $table->boolean('is_deleted')->default(false);
         // 👇 BAN関連 
         $table->timestamp('banned_at')->nullable();
-        
+        // 👇 招待
+        $table->string('invite_code', 12)->unique();
+        $table->uuid('invited_by')->nullable();
+        $table->foreign('invited_by')->references('id')->on('users')->nullOnDelete();
 
         $table->timestamps();
     });

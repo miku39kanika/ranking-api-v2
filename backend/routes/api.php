@@ -27,12 +27,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/likes/toggle', [LikeController::class, 'toggle']);
         Route::post('/comments', [CommentController::class, 'store']);
         Route::post('/currency/change', [CurrencyController::class, 'change']);
+        Route::post('user/invite',[UserController::class, 'applyInvite']);
      });
      Route::middleware('throttle:2,1')->group(function () {
         Route::post('/reports', [ReportController::class, 'store']);
         Route::put('/personal-ranking/update', [PersonalRankingController::class, 'update']);
         Route::post('/rankings', [RankingController::class, 'store']);
         Route::put('/users/update', [UserController::class, 'update']);
+        
      });
      Route::middleware('throttle:30,1')->group(function () {
     Route::post('/vote', [VoteController::class, 'vote']);
@@ -49,7 +51,7 @@ Route::get('/items/my-items', [ItemController::class, 'myItems']);
 Route::get('/ranking/row/{id}', [RankingController::class, 'rowShow']);
 Route::get('/rankings', [RankingController::class, 'index']);
 Route::post('/follow', [FollowController::class, 'follow']);
-
+Route::get('/ranking/invite/{inviteCode}',[RankingController::class, 'showByInviteCode']);
 });
 
 //sanctum認証不要なルート
@@ -63,30 +65,18 @@ Route::middleware('throttle:10,1')->group(function () {
 });
 Route::get('/personal-ranking/{userId}', [PersonalRankingController::class, 'show']);
 Route::get('/users/{userId}/voted-rankings',[VoteController::class, 'votedRankings']);
-
-
-
 Route::get('/rankings/official-latest', [RankingController::class, 'officialLatest']);
 Route::get('/ranking/{id}', [RankingController::class, 'show']);
-
-
-
-
 Route::get('/users/{device_id}', [UserController::class, 'show']);
-
 Route::get('/random-rankings', [RankingController::class, 'random']);
-
 Route::get('/follow/counts/{userId}', [FollowController::class, 'counts']);
 Route::get('/follow/followings/{userId}', [FollowController::class, 'followings']);
 Route::get('/follow/followers/{userId}', [FollowController::class, 'followers']);
 Route::get('/game/session', [GameController::class, 'getSession']);
 Route::get('/rankings/user/{userId}', [RankingController::class, 'getByUser']);
 Route::get('/tags', [TagController::class, 'index']);
-
 Route::get('/announcements', [AnnouncementController::class, 'index']);
 Route::get('/announcements/{id}', [AnnouncementController::class, 'show']);
 Route::get('/items/{id}', [RankingItemController::class, 'show']);
-
-
 
 

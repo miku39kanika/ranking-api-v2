@@ -29,11 +29,13 @@ class AuthController extends Controller
     'device_id' => $request->device_id,
     'email' => null,
     'plan_type'=> 0,
-    'icon_type' => 'ast',
+    'icon_type' => 'asset',
     'icon_name' => "ast01",
     'about_self' => 'よろしくお願いします！',
     'is_deleted' => false,
     'banned_at' => null,
+    'invite_code' => $this->generatePublicId(),
+    'invited_by' => null,
 ]);
  // orb取得
             $orb = Currency::where('code', 'orb')->first();
@@ -111,6 +113,8 @@ Log::info('USER', ['user' => $user]);
     'about_self' => $user->about_self,
     'is_deleted' => $user->is_deleted,
     'banned_at' => $user->banned_at,
+    'invite_code' => $user->invite_code,
+    'invited_by' => $user->invited_by,
     ]
 ]);
 }
@@ -128,7 +132,8 @@ private function generatePublicId(): string
         }
 
     } while (
-        User::where('public_id', $id)->exists()
+        User::where('public_id', $id)->exists()||
+        User::where('invite_code', $id)->exists()
     );
 
     return $id;
