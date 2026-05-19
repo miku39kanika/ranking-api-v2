@@ -28,6 +28,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/comments', [CommentController::class, 'store']);
         Route::post('/currency/change', [CurrencyController::class, 'change']);
         Route::post('user/invite',[UserController::class, 'applyInvite']);
+        Route::post('user/email',[UserController::class, 'updateEmail']);
+        Route::post('/user/email/send-code',[UserController::class, 'sendVerifyCode']);
+        Route::post('/user/email/verify',[UserController::class, 'verifyEmail']);
+        Route::post('/user/transfer',[UserController::class, 'transferAccount']);
+        Route::post('/user/transfer/send-code',[UserController::class, 'sendTransferCode']);
      });
      Route::middleware('throttle:2,1')->group(function () {
         Route::post('/reports', [ReportController::class, 'store']);

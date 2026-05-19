@@ -36,6 +36,7 @@ class AuthController extends Controller
     'banned_at' => null,
     'invite_code' => $this->generatePublicId(),
     'invited_by' => null,
+    'email_verified_at' => null,
 ]);
  // orb取得
             $orb = Currency::where('code', 'orb')->first();
@@ -115,6 +116,7 @@ Log::info('USER', ['user' => $user]);
     'banned_at' => $user->banned_at,
     'invite_code' => $user->invite_code,
     'invited_by' => $user->invited_by,
+    'email_verified_at' => $user->email_verified_at,
     ]
 ]);
 }

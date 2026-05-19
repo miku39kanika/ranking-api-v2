@@ -34,7 +34,11 @@ return new class extends Migration
         $table->string('invite_code', 12)->unique();
         $table->uuid('invited_by')->nullable();
         $table->foreign('invited_by')->references('id')->on('users')->nullOnDelete();
-
+        // 👇 メール認証関連
+        $table->string('email_verify_code')
+            ->nullable();
+        $table->timestamp('email_verified_at')
+            ->nullable();
         $table->timestamps();
     });
 }

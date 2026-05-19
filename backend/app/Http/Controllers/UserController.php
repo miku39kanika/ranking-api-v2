@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Services\ContentFilterService;
 use App\Models\Gift;
-
+use Illuminate\Support\Facades\Mail;
 class UserController extends Controller
 {
     public function show($device_id)
@@ -160,5 +160,167 @@ if ($user->invited_by) {
     });
 
 return response()->json($user);
+}
+
+public function sendVerifyCode(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email|unique:users,email',
+    ]);
+
+    $user = $request->user();
+
+    $code = random_int(100000, 999999);
+
+    $user->email = $request->email;
+
+    // 👇 未認証に戻す
+    $user->email_verified_at = null;
+
+    $user->email_verify_code = $code;
+
+    $user->save();
+
+    Mail::raw(
+        "認証コード: {$code}",
+        function ($message) use ($user) {
+
+            $message->to($user->email)
+                ->subject('メール認証');
+        }
+    );
+
+    return response()->json([
+        'success' => true
+    ]);
+}
+
+public function verifyEmail(Request $request)
+{
+    $request->validate([
+        'code' => 'required',
+    ]);
+
+    $user = $request->user();
+
+    if ($user->email_verify_code !== $request->code) {
+
+        return response()->json([
+            'message' => 'invalid code'
+        ], 400);
+    }
+
+    $user->email_verified_at = now();
+    $user->email_verify_code = null;
+    $user->save();
+
+    return response()->json($user);
+}
+
+public function transferAccount(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'code' => 'required',
+    ]);
+
+    // 👇 引き継ぎ先（今の端末）
+    $currentUser = $request->user();
+
+    // 👇 引き継ぎ元
+    $targetUser = User::where(
+        'email',
+        $request->email
+    )->first();
+
+    if (!$targetUser) {
+
+        return response()->json([
+            'message' => 'user not found'
+        ], 404);
+    }
+if (!$targetUser->email_verified_at) {
+
+    return response()->json([
+        'message' => 'email not verified'
+    ], 400);
+}
+    // 👇 認証コード確認
+    if (
+        $targetUser->email_verify_code !==
+        $request->code
+    ) {
+
+        return response()->json([
+            'message' => 'invalid code'
+        ], 400);
+    }
+
+    // 👇 認証済みにする
+    $targetUser->email_verified_at = now();
+    $targetUser->email_verify_code = null;
+
+    // 👇 device_id を新端末へ
+    // 👇 今の端末ID
+$newDeviceId = $currentUser->device_id;
+
+// 👇 現在の仮アカウントを切り離す
+$currentUser->device_id = null;
+$currentUser->save();
+
+// 👇 引き継ぎ先へ端末紐付け
+$targetUser->device_id = $newDeviceId;
+
+// 👇 認証コード削除
+$targetUser->email_verify_code = null;
+
+$targetUser->save();
+
+    return response()->json($targetUser);
+}
+
+public function sendTransferCode(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+    ]);
+
+    $targetUser = User::where(
+        'email',
+        $request->email
+    )->first();
+
+    if (!$targetUser) {
+
+        return response()->json([
+            'message' => 'user not found'
+        ], 404);
+    }
+
+    if (!$targetUser->email_verified_at) {
+
+        return response()->json([
+            'message' => 'email not verified'
+        ], 400);
+    }
+
+    $code = random_int(100000, 999999);
+
+    $targetUser->email_verify_code = $code;
+
+    $targetUser->save();
+
+    Mail::raw(
+        "引き継ぎ認証コード: {$code}",
+        function ($message) use ($targetUser) {
+
+            $message->to($targetUser->email)
+                ->subject('アカウント引き継ぎ');
+        }
+    );
+
+    return response()->json([
+        'success' => true
+    ]);
 }
 }
