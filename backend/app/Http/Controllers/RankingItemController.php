@@ -7,6 +7,7 @@ use App\Models\RankingItem;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Services\ContentFilterService;
+use App\Models\Ranking;
 
 class RankingItemController extends Controller
 {
@@ -50,6 +51,29 @@ class RankingItemController extends Controller
             return response()->json([
                 'error' => 'NG_WORD'
             ], 422);
+        }
+
+        $ranking = Ranking::find($request->ranking_id);
+
+        if (!$ranking) {
+
+            return response()->json([
+                'message' => 'Ranking not found'
+            ], 404);
+        }
+
+        $isOwner =
+            $ranking->user_id === $request->user()->id;
+
+        // 項目追加制限
+        if (
+            $ranking->is_item_add_limited
+            && !$isOwner
+        ) {
+
+            return response()->json([
+                'error' => 'ITEM_ADD_LIMITED'
+            ], 403);
         }
 
         // =====================

@@ -142,6 +142,8 @@ class RankingController extends Controller
                     'title' => $ranking->title,
                     'reading' => $ranking->reading,
                     'is_liked' => (int)($ranking->is_liked ?? 0),
+                    'daily_vote_limit' => $ranking->daily_vote_limit,
+                    'total_vote_limit' => $ranking->total_vote_limit,
                     'created_at' => $ranking->created_at,
                     'tags' => $ranking->tags->map(function ($tag) {
 
@@ -215,6 +217,19 @@ class RankingController extends Controller
                     'name' => $tag->name,
                 ];
             }),
+            'daily_vote_limit' => $ranking->daily_vote_limit,
+            'total_vote_limit' => $ranking->total_vote_limit,
+            'can_vote' => (
+                $ranking->vote_permission === 'public_access'
+                || $ranking->user_id === $userId
+                || (
+                    in_array(
+                        $ranking->vote_permission,
+                        ['invite_only_view', 'invite_only_hidden']
+                    )
+                    && $isInvited
+                )
+            ),
         ]);
     }
     public function rowShow($id, Request $request)
@@ -231,11 +246,39 @@ class RankingController extends Controller
                 'message' => 'Ranking not found'
             ], 404);
         }
-
         $isInvited = DB::table('ranking_invites')
             ->where('ranking_id', $ranking->id)
             ->where('user_id', $userId)
             ->exists();
+        $myTotalVotes = Vote::where('ranking_id', $ranking->id)
+            ->where('user_identifier', $userId)
+            ->count();
+
+        $myTodayVotes = Vote::where('ranking_id', $ranking->id)
+            ->where('user_identifier', $userId)
+            ->whereDate('vote_date', today())
+            ->count();
+        $hasInvitePermission =
+            $ranking->vote_permission === 'public_access'
+            || $ranking->user_id === $userId
+            || (
+                in_array(
+                    $ranking->vote_permission,
+                    ['invite_only_view', 'invite_only_hidden']
+                )
+                && $isInvited
+            );
+
+        $withinDailyLimit =
+            $myTodayVotes < $ranking->daily_vote_limit;
+
+        $withinTotalLimit =
+            $myTotalVotes < $ranking->total_vote_limit;
+
+        $canVote =
+            $hasInvitePermission
+            && $withinDailyLimit
+            && $withinTotalLimit;
         $isOwner = $ranking->user_id === $userId;
 
         // if (
@@ -288,17 +331,10 @@ class RankingController extends Controller
                 'about_self' => $ranking->user->about_self,
                 'plan_type' => $ranking->user->plan_type,
             ] : null,
-            'can_vote' => (
-                $ranking->vote_permission === 'public_access'
-                || $ranking->user_id === $userId
-                || (
-                    in_array(
-                        $ranking->vote_permission,
-                        ['invite_only_view', 'invite_only_hidden']
-                    )
-                    && $isInvited
-                )
-            ),
+            'is_item_add_limited' => (bool)$ranking->is_item_add_limited,
+            'can_vote' => $canVote,
+            'daily_vote_limit' => $ranking->daily_vote_limit,
+            'total_vote_limit' => $ranking->total_vote_limit,
             'invite_code' => $ranking->invite_code,
         ]);
     }
@@ -339,6 +375,8 @@ class RankingController extends Controller
             'reading' => $ranking->reading,
             'image_name' => $ranking->image_name,
             'created_at' => $ranking->created_at,
+            'daily_vote_limit' => $ranking->daily_vote_limit,
+            'total_vote_limit' => $ranking->total_vote_limit,
         ]);
     }
 
@@ -392,6 +430,8 @@ class RankingController extends Controller
                         ];
                     }),
                     'items' => [],
+                    'daily_vote_limit' => $ranking->daily_vote_limit,
+                    'total_vote_limit' => $ranking->total_vote_limit,
                 ];
             })
         );
@@ -405,10 +445,41 @@ class RankingController extends Controller
             ->first();
 
         if (!$ranking) {
+
             return response()->json([
                 'message' => 'Ranking not found'
             ], 404);
         }
+
+        DB::table('ranking_invites')->updateOrInsert(
+            [
+                'ranking_id' => $ranking->id,
+                'user_id' => $userId,
+            ],
+            [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+        $myTotalVotes = Vote::where('ranking_id', $ranking->id)
+            ->where('user_identifier', $userId)
+            ->count();
+
+        $myTodayVotes = Vote::where('ranking_id', $ranking->id)
+            ->where('user_identifier', $userId)
+            ->whereDate('vote_date', today())
+            ->count();
+
+        $withinDailyLimit =
+            $myTodayVotes < $ranking->daily_vote_limit;
+
+        $withinTotalLimit =
+            $myTotalVotes < $ranking->total_vote_limit;
+
+        $canVote =
+            $withinDailyLimit
+            && $withinTotalLimit;
 
         return response()->json([
 
@@ -418,13 +489,17 @@ class RankingController extends Controller
             'image_name' => $ranking->image_name,
             'created_at' => $ranking->created_at,
             'is_liked' => 0,
+
             'tags' => $ranking->tags->map(function ($tag) {
+
                 return [
                     'id' => $tag->id,
                     'name' => $tag->name,
                 ];
             }),
+
             'items' => $ranking->items->map(function ($item) {
+
                 return [
                     'id' => $item->id,
                     'name' => $item->name,
@@ -432,6 +507,10 @@ class RankingController extends Controller
                     'aliases' => $item->aliases,
                 ];
             }),
+            'is_item_add_limited' => (bool)$ranking->is_item_add_limited,
+            'daily_vote_limit' => $ranking->daily_vote_limit,
+            'total_vote_limit' => $ranking->total_vote_limit,
+            'can_vote' => $canVote,
         ]);
     }
 }
