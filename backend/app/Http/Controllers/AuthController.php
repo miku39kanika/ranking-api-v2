@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\DB;
 class AuthController extends Controller
 {
     public function guestLogin(Request $request)
-{Log::info('guestLogin called');
+    {
+        Log::info('guestLogin called');
         // 既存ユーザー確認（同じ端末）
         $user = User::where('device_id', $request->device_id)->first();
 
@@ -23,22 +24,22 @@ class AuthController extends Controller
         if (!$user) {
             Log::info('guestcreated called');
             $user = User::create([
-    'id' => (string) Str::uuid(),
-    'public_id' => $this->generatePublicId(),
-    'user_name' => '名無しのユーザー',
-    'device_id' => $request->device_id,
-    'email' => null,
-    'plan_type'=> 0,
-    'icon_type' => 'asset',
-    'icon_name' => "ast01",
-    'about_self' => 'よろしくお願いします！',
-    'is_deleted' => false,
-    'banned_at' => null,
-    'invite_code' => $this->generatePublicId(),
-    'invited_by' => null,
-    'email_verified_at' => null,
-]);
- // orb取得
+                'id' => (string) Str::uuid(),
+                'public_id' => $this->generatePublicId(),
+                'user_name' => '名無しのユーザー',
+                'device_id' => $request->device_id,
+                'email' => null,
+                'plan_type' => 0,
+                'icon_type' => 'asset',
+                'icon_name' => "ast01",
+                'about_self' => 'よろしくお願いします！',
+                'is_deleted' => false,
+                'banned_at' => null,
+                'invite_code' => $this->generatePublicId(),
+                'invited_by' => null,
+                'email_verified_at' => null,
+            ]);
+            // orb取得
             $orb = Currency::where('code', 'orb')->first();
 
             // 現在所持数
@@ -55,89 +56,87 @@ class AuthController extends Controller
                 'amount' => 100,
                 'reason' => '初回登録ボーナス',
             ]);
-            
-            $ranking = PersonalRanking::create([
-    'user_id' => $user->id,
-    'title' => '',
-]);
 
-$ranking->items()->createMany([
-    [
-        'rank' => 1,
-        'word' => '',
-    ],
-    [
-        'rank' => 2,
-        'word' => '',
-    ],
-    [
-        'rank' => 3,
-        'word' => '',
-    ],
-]);
+            $ranking = PersonalRanking::create([
+                'user_id' => $user->id,
+                'title' => '',
+            ]);
+
+            $ranking->items()->createMany([
+                [
+                    'rank' => 1,
+                    'word' => '',
+                ],
+                [
+                    'rank' => 2,
+                    'word' => '',
+                ],
+                [
+                    'rank' => 3,
+                    'word' => '',
+                ],
+            ]);
 
             $starterItems = DB::table('starter_items')
-    ->where('is_active', true)
-    ->where('trigger', 'register')
-    ->get();
-    foreach ($starterItems as $item) {
-    DB::table('user_items')->updateOrInsert(
-        [
-            'user_id' => $user->id,
-            'item_id' => $item->item_id,
-        ],
-        [
-            'quantity' => DB::raw('quantity + ' . $item->quantity),
-            'updated_at' => now(),
-            'created_at' => now(),
-        ]
-    );
-}
-        }else{
+                ->where('is_active', true)
+                ->where('trigger', 'register')
+                ->get();
+            foreach ($starterItems as $item) {
+                DB::table('user_items')->updateOrInsert(
+                    [
+                        'user_id' => $user->id,
+                        'item_id' => $item->item_id,
+                    ],
+                    [
+                        'quantity' => DB::raw('quantity + ' . $item->quantity),
+                        'updated_at' => now(),
+                        'created_at' => now(),
+                    ]
+                );
+            }
+        } else {
             $user->tokens()->delete();
-
         }
-// 🔥 ログ出力
-Log::info('USER', ['user' => $user]);
-    $token = $user->createToken('ios-device:' . $request->device_id)->plainTextToken;
+        // 🔥 ログ出力
+        Log::info('USER', ['user' => $user]);
+        $token = $user->createToken('ios-device:' . $request->device_id)->plainTextToken;
         return response()->json([
-        'token' => $token,
-        'user' => [
-    'id' => (string) $user->id,
-    'public_id' => $user->public_id,
-    'user_name' => $user->user_name,
-    'device_id' => $user->device_id,
-    'email' => $user->email,
-    'plan_type'=> $user->plan_type,
-    'icon_type' => $user->icon_type,
-    'icon_name' => $user->icon_name,
-    'about_self' => $user->about_self,
-    'is_deleted' => $user->is_deleted,
-    'banned_at' => $user->banned_at,
-    'invite_code' => $user->invite_code,
-    'invited_by' => $user->invited_by,
-    'email_verified_at' => $user->email_verified_at,
-    ]
-]);
-}
+            'token' => $token,
+            'user' => [
+                'id' => (string) $user->id,
+                'public_id' => $user->public_id,
+                'user_name' => $user->user_name,
+                'device_id' => $user->device_id,
+                'email' => $user->email,
+                'plan_type' => $user->plan_type,
+                'icon_type' => $user->icon_type,
+                'icon_name' => $user->icon_name,
+                'about_self' => $user->about_self,
+                'is_deleted' => $user->is_deleted,
+                'banned_at' => $user->banned_at,
+                'invite_code' => $user->invite_code,
+                'invited_by' => $user->invited_by,
+                'email_verified_at' => $user->email_verified_at,
+            ]
+        ]);
+    }
 
-private function generatePublicId(): string
-{
-    $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    private function generatePublicId(): string
+    {
+        $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
-    do {
+        do {
 
-        $id = '';
+            $id = '';
 
-        for ($i = 0; $i < 10; $i++) {
-            $id .= $chars[random_int(0, strlen($chars) - 1)];
-        }
+            for ($i = 0; $i < 10; $i++) {
+                $id .= $chars[random_int(0, strlen($chars) - 1)];
+            }
+        } while (
+            User::where('public_id', $id)->exists() ||
+            User::where('invite_code', $id)->exists()
+        );
 
-    } while (
-        User::where('public_id', $id)->exists()||
-        User::where('invite_code', $id)->exists()
-    );
-
-    return $id;
-}
+        return $id;
+    }
 }

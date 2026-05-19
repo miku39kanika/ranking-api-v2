@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Like;
 use Illuminate\Support\Facades\Log;
+
 class LikeController extends Controller
 {
     // 👍 いいねトグル

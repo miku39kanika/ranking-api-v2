@@ -70,22 +70,22 @@ class UsersTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-          $users[] = [
-                'id' => "user_99",
-                'public_id' => 0000000000,
-                'invite_code' => 0000000000,
-                'user_name' => "公式太郎",
-                'device_id' => null,
-                'email' => null,
-                'plan_type' => 0,
-                'icon_type' => 'asset',
-                'icon_name' => "icon99",
-                'about_self' => "公式の人です",
-                'is_deleted' => false,
-                'banned_at' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
+        $users[] = [
+            'id' => "user_99",
+            'public_id' => 0000000000,
+            'invite_code' => 0000000000,
+            'user_name' => "公式太郎",
+            'device_id' => null,
+            'email' => null,
+            'plan_type' => 0,
+            'icon_type' => 'asset',
+            'icon_name' => "icon99",
+            'about_self' => "公式の人です",
+            'is_deleted' => false,
+            'banned_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
         DB::table('users')->insert($users);
     }
 }

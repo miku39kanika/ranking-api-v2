@@ -45,7 +45,7 @@ class StarterItemsTableSeeder extends Seeder
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
-                        [
+            [
                 'item_id' => 7, // アイテム：ガチャチケ
                 'quantity' => 5,
                 'is_active' => true,

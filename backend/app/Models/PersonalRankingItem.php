@@ -14,7 +14,7 @@ class PersonalRankingItem extends Model
     ];
 
     public function ranking()
-{
-    return $this->belongsTo(PersonalRanking::class);
-}
+    {
+        return $this->belongsTo(PersonalRanking::class);
+    }
 }

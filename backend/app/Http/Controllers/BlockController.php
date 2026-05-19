@@ -13,19 +13,19 @@ class BlockController extends Controller
     // =====================
     // ブロック
     // =====================
-public function index(Request $request)
-{
-    Log::info('BlockController@index called');
+    public function index(Request $request)
+    {
+        Log::info('BlockController@index called');
 
-    $userId = $request->user()->id;
+        $userId = $request->user()->id;
 
-    $blockedUserIds = Block::where('user_id', $userId)
-        ->pluck('blocked_user_id');
+        $blockedUserIds = Block::where('user_id', $userId)
+            ->pluck('blocked_user_id');
 
-    return response()->json([
-        'blocked_user_ids' => $blockedUserIds
-    ]);
-}
+        return response()->json([
+            'blocked_user_ids' => $blockedUserIds
+        ]);
+    }
 
     public function store(Request $request)
     {
@@ -54,7 +54,6 @@ public function index(Request $request)
                 'follower_id' => $userId,
                 'followed_id' => $blockedUserId,
             ]);
-
         })->orWhere(function ($query) use ($userId, $blockedUserId) {
 
             // 相手 → 自分
@@ -62,7 +61,6 @@ public function index(Request $request)
                 'follower_id' => $blockedUserId,
                 'followed_id' => $userId,
             ]);
-
         })->delete();
 
         return response()->json([
@@ -87,26 +85,26 @@ public function index(Request $request)
     }
 
     public function status(Request $request)
-{
-    Log::info('BlockController@status called');
+    {
+        Log::info('BlockController@status called');
 
-    $userId = $request->user()->id;
-    $blockedUserId = $request->query('blocked_user_id');
+        $userId = $request->user()->id;
+        $blockedUserId = $request->query('blocked_user_id');
 
-    if (!$blockedUserId) {
+        if (!$blockedUserId) {
+            return response()->json([
+                'is_blocked' => false
+            ], 400);
+        }
+
+        $isBlocked = Block::where('user_id', $userId)
+            ->where('blocked_user_id', $blockedUserId)
+            ->exists();
+
         return response()->json([
-            'is_blocked' => false
-        ], 400);
+            'is_blocked' => $isBlocked
+        ]);
     }
-
-    $isBlocked = Block::where('user_id', $userId)
-        ->where('blocked_user_id', $blockedUserId)
-        ->exists();
-
-    return response()->json([
-        'is_blocked' => $isBlocked
-    ]);
-}
 }
 
 function isBlocked($me, $target)
@@ -119,14 +117,11 @@ function isBlocked($me, $target)
                 'user_id' => $me,
                 'blocked_user_id' => $target
             ]);
-
         })->orWhere(function ($q) use ($me, $target) {
 
             $q->where([
                 'user_id' => $target,
                 'blocked_user_id' => $me
             ]);
-
         })->exists();
-        
 }

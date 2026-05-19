@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('follows', function (Blueprint $table) {
-    $table->id();
-    $table->uuid('follower_id'); // フォローする人
-    $table->uuid('followed_id'); // フォローされる人
-    $table->timestamps();
+            $table->id();
+            $table->uuid('follower_id'); // フォローする人
+            $table->uuid('followed_id'); // フォローされる人
+            $table->timestamps();
 
-    $table->unique(['follower_id', 'followed_id']); // 重複防止
-});
+            $table->unique(['follower_id', 'followed_id']); // 重複防止
+        });
     }
 
     /**

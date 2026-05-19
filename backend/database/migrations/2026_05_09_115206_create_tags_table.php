@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tags', function (Blueprint $table) {
-    $table->id();
+            $table->id();
 
-    $table->string('name')->unique();
-    $table->string('tag_image_name')->nullable();
+            $table->string('name')->unique();
+            $table->string('tag_image_name')->nullable();
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

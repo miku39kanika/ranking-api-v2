@@ -12,17 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_items', function (Blueprint $table) {
-        $table->id();
-        $table->uuid('user_id');
-        $table->foreignId('item_id')->constrained()->cascadeOnDelete();
+            $table->id();
+            $table->uuid('user_id');
+            $table->foreignId('item_id')->constrained()->cascadeOnDelete();
 
-        $table->integer('quantity')->default(1);
+            $table->integer('quantity')->default(1);
 
-    // 👇 ここが有効期限
-        $table->timestamp('expires_at')->nullable();
+            // 👇 ここが有効期限
+            $table->timestamp('expires_at')->nullable();
 
-        $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

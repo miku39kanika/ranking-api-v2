@@ -9,13 +9,13 @@ class ReadingService
 {
     public function generate(string $text): ?string
     {
-       return Cache::remember("reading:$text", 86400, function () use ($text) {
+        return Cache::remember("reading:$text", 86400, function () use ($text) {
 
-    $response = Http::get('https://api.excelapi.org/language/kanji2kana', [
-    'text' => $text
-]);
+            $response = Http::get('https://api.excelapi.org/language/kanji2kana', [
+                'text' => $text
+            ]);
 
-return $response->body();
-         });
+            return $response->body();
+        });
     }
 }

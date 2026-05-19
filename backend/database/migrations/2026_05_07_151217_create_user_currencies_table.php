@@ -13,20 +13,20 @@ return new class extends Migration
     {
         Schema::create('user_currencies', function (Blueprint $table) {
 
-    $table->id();
+            $table->id();
 
-    $table->string('user_id');
+            $table->string('user_id');
 
-    $table->foreignId('currency_id')
-        ->constrained()
-        ->cascadeOnDelete();
+            $table->foreignId('currency_id')
+                ->constrained()
+                ->cascadeOnDelete();
 
-    $table->integer('amount')->default(0);
+            $table->integer('amount')->default(0);
 
-    $table->timestamps();
+            $table->timestamps();
 
-    $table->unique(['user_id', 'currency_id']);
-});
+            $table->unique(['user_id', 'currency_id']);
+        });
     }
 
     /**

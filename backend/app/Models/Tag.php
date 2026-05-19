@@ -9,7 +9,7 @@ class Tag extends Model
     protected $fillable = [
         'name',
         'tag_image_name',
-    
+
     ];
 
     public function rankings()

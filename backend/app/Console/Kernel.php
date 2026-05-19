@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
@@ -7,8 +8,8 @@ use App\Console\Commands\GenerateGameQuestions;
 
 class Kernel extends ConsoleKernel
 {
-protected function schedule(Schedule $schedule)
-{
-    $schedule->command('game:generate')->daily();
-}
+    protected function schedule(Schedule $schedule)
+    {
+        $schedule->command('game:generate')->daily();
+    }
 };

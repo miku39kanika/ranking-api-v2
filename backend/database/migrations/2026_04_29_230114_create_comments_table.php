@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-Schema::create('comments', function (Blueprint $table) {
-    $table->id();
+        Schema::create('comments', function (Blueprint $table) {
+            $table->id();
 
-    $table->unsignedBigInteger('ranking_id'); 
+            $table->unsignedBigInteger('ranking_id');
 
-    $table->string('user_id');
-    $table->text('body');
+            $table->string('user_id');
+            $table->text('body');
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

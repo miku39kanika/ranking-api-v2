@@ -12,25 +12,25 @@ class AnnouncementController extends Controller
         Log::info('AnnouncementController@index called');
         $query = Announcement::query();
 
-if ($from = request('from')) {
+        if ($from = request('from')) {
 
-    $query->where(function ($q) use ($from) {
+            $query->where(function ($q) use ($from) {
 
-    $q->whereDate('created_at', '>=', $from)
-      ->where(function ($q2) {
-          $q2->whereNull('send_at')
-             ->orWhere('send_at', '<=', now());
-      })
-      ->orWhere('important', true);
-});
-}
+                $q->whereDate('created_at', '>=', $from)
+                    ->where(function ($q2) {
+                        $q2->whereNull('send_at')
+                            ->orWhere('send_at', '<=', now());
+                    })
+                    ->orWhere('important', true);
+            });
+        }
 
-$announcements =
-    $query
-    ->latest()
-    ->get();
+        $announcements =
+            $query
+            ->latest()
+            ->get();
 
-    Log::info('AnnouncementController@index called');
+        Log::info('AnnouncementController@index called');
 
         return response()->json($announcements);
     }

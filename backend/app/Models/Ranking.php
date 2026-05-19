@@ -7,47 +7,49 @@ use App\Models\RankingItem;
 use App\Models\User;
 use App\Models\Comment;
 use App\Models\Like;
+
 class Ranking extends Model
-{protected $fillable = [
-    'title',
-    'reading',
-    'tag',
-    'image_name',
-    'is_item_add_limited',
-    'daily_vote_limit',
-    'total_vote_limit',
-    'vote_permission',
-    'user_id',
-    'invite_code'
-];
+{
+    protected $fillable = [
+        'title',
+        'reading',
+        'tag',
+        'image_name',
+        'is_item_add_limited',
+        'daily_vote_limit',
+        'total_vote_limit',
+        'vote_permission',
+        'user_id',
+        'invite_code'
+    ];
 
     public function items()
-{
-    return $this->hasMany(RankingItem::class);
-}
+    {
+        return $this->hasMany(RankingItem::class);
+    }
 
-public function user()
-{
-    return $this->belongsTo(
-    User::class,
-    'user_id',
-    'id'
-);
-}
-public function comments()
-{
-    return $this->hasMany(Comment::class);
-}
-public function tags()
-{
-    return $this->belongsToMany(Tag::class);
-}
-public function invites()
-{
-    return $this->hasMany(RankingInvite::class);
-}
-public function likes()
-{
-    return $this->hasMany(Like::class);
-}
+    public function user()
+    {
+        return $this->belongsTo(
+            User::class,
+            'user_id',
+            'id'
+        );
+    }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+    public function invites()
+    {
+        return $this->hasMany(RankingInvite::class);
+    }
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
 }

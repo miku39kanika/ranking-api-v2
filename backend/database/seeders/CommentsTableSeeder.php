@@ -15,7 +15,7 @@ class CommentsTableSeeder extends Seeder
         for ($i = 1; $i <= 10; $i++) {
             $userIds[] = "user_" . str_pad($i, 2, "0", STR_PAD_LEFT);
         }
-        
+
         $rankingIds = [1, 2, 3, 4, 5]; // ←実際のrankingに合わせて調整
 
         $sampleComments = [

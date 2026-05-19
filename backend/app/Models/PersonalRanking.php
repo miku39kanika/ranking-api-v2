@@ -12,7 +12,7 @@ class PersonalRanking extends Model
         'title',
     ];
     public function items()
-{
-    return $this->hasMany(PersonalRankingItem::class);
-}
+    {
+        return $this->hasMany(PersonalRankingItem::class);
+    }
 }

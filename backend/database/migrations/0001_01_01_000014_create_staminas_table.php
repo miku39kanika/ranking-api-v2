@@ -10,19 +10,19 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('staminas', function (Blueprint $table) {
-    $table->id();
+    {
+        Schema::create('staminas', function (Blueprint $table) {
+            $table->id();
 
-    $table->uuid('user_id');
-    $table->integer('vote_stamina')->default(10);
-    $table->integer('create_stamina')->default(3);
+            $table->uuid('user_id');
+            $table->integer('vote_stamina')->default(10);
+            $table->integer('create_stamina')->default(3);
 
-    $table->timestamp('last_recovered_at')->nullable();
+            $table->timestamp('last_recovered_at')->nullable();
 
-    $table->timestamps();
-});
-}
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

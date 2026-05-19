@@ -13,16 +13,16 @@ return new class extends Migration
     {
         Schema::create('user_tag', function (Blueprint $table) {
 
-    $table->id();
+            $table->id();
 
-    $table->string('user_id');
+            $table->string('user_id');
 
-    $table->foreignId('tag_id')
-        ->constrained()
-        ->onDelete('cascade');
+            $table->foreignId('tag_id')
+                ->constrained()
+                ->onDelete('cascade');
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

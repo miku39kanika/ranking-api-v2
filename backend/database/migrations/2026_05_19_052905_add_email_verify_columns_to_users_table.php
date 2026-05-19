@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('game_questions', function (Blueprint $table) {
-            $table->id();
-            $table->json('data'); // 問題データ
-            $table->date('generated_date'); // いつの問題か
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+
+            $table->string('email_verify_code')
+                ->nullable();
+
+            $table->timestamp('email_verified_at')
+                ->nullable();
         });
     }
 
@@ -24,6 +26,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('game_questions');
+        Schema::table('users', function (Blueprint $table) {
+            //
+        });
     }
 };

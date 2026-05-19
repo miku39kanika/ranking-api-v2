@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('announcements', function (Blueprint $table) {
 
-    $table->id();
+            $table->id();
 
-    $table->string('title');
+            $table->string('title');
 
-    $table->text('body');
+            $table->text('body');
 
-    $table->boolean('important')->default(false);
-    $table->dateTime('send_at')->nullable()->index();
+            $table->boolean('important')->default(false);
+            $table->dateTime('send_at')->nullable()->index();
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

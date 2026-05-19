@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('personal_rankings', function (Blueprint $table) {
-    $table->id();
+        Schema::create('personal_rankings', function (Blueprint $table) {
+            $table->id();
 
-    $table->string('user_id')->unique();
+            $table->string('user_id')->unique();
 
-    $table->string('title', 30)->nullable();
+            $table->string('title', 30)->nullable();
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

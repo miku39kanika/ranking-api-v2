@@ -14,7 +14,7 @@ return new class extends Migration
             // アイテム基本情報
             $table->string('name', 100);
             $table->text('description')->nullable();
-             // タイプ
+            // タイプ
             $table->string('type', 20)->default('item');
             // icon:アイコン画像
             // item:消費アイテム

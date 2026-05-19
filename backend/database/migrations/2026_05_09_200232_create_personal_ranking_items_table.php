@@ -12,18 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('personal_ranking_items', function (Blueprint $table) {
-    $table->id();
+            $table->id();
 
-    $table->foreignId('personal_ranking_id')
-        ->constrained()
-        ->onDelete('cascade');
+            $table->foreignId('personal_ranking_id')
+                ->constrained()
+                ->onDelete('cascade');
 
-    $table->integer('rank');
+            $table->integer('rank');
 
-    $table->string('word', 15);
+            $table->string('word', 15);
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

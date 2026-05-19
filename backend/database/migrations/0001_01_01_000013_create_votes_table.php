@@ -10,16 +10,16 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('votes', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('ranking_id')->constrained()->onDelete('cascade');
-        $table->foreignId('ranking_item_id')->constrained()->onDelete('cascade');
-        $table->string('user_identifier',64); // IP or UUID
-        $table->timestamps();
-        $table->date('vote_date')->nullable();
-    });
-}
+    {
+        Schema::create('votes', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('ranking_id')->constrained()->onDelete('cascade');
+            $table->foreignId('ranking_item_id')->constrained()->onDelete('cascade');
+            $table->string('user_identifier', 64); // IP or UUID
+            $table->timestamps();
+            $table->date('vote_date')->nullable();
+        });
+    }
     /**
      * Reverse the migrations.
      */

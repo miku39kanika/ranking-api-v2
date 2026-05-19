@@ -11,7 +11,7 @@ class RankingInvite extends Model
         'user_id',
     ];
     public function ranking()
-{
-    return $this->belongsTo(Ranking::class);
-}
+    {
+        return $this->belongsTo(Ranking::class);
+    }
 }
