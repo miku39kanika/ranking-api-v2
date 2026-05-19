@@ -128,11 +128,12 @@ class RankingController extends Controller
                 ->orderByRaw(
                     'COUNT(DISTINCT votes.user_identifier) DESC'
                 )
+                ->orderByDesc('rankings.id')
                 ->select('rankings.*');
         }
 
         $rankings = $query->paginate(20);
-
+        Log::info($rankings->pluck('vote_permission'));
         return response()->json([
             'data' => $rankings->getCollection()->map(function ($ranking) use ($userId) {
 

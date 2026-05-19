@@ -166,7 +166,7 @@ class RankingWithItemsSeeder extends Seeder
                     'ranking_type' => 0,
                     'title' => $title,
                     'reading' => null,
-                    'tag' => "test,ranking,game",
+                    'tag' => "アニメ",
                     'image_name' => "sample1",
                     'is_item_add_limited' => rand(0, 1),
                     'daily_vote_limit' => rand(1, 3),
@@ -213,10 +213,41 @@ class RankingWithItemsSeeder extends Seeder
             'is_item_add_limited' => 1,
             'daily_vote_limit' => 0,
             'total_vote_limit' => 0,
-            'vote_permission' => 'public_access',
+            'vote_permission' => 'invite_only_view',
             'user_id' => "user_99",
             'created_at' => $now,
             'updated_at' => $now,
         ]);
+
+        $rankingId = DB::table('rankings')->insertGetId([
+            'ranking_type' => 0,
+            'title' => "インバイトオンリービュー",
+            'reading' => "いんばいとおんりーびゅー",
+            'tag' => "アニメ",
+            'image_name' => "anime_default",
+            'is_item_add_limited' => 1,
+            'daily_vote_limit' => 0,
+            'total_vote_limit' => 0,
+            'vote_permission' => 'invite_only_view',
+            'user_id' => "user_99",
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+        $rankingId = DB::table('rankings')->insertGetId([
+            'ranking_type' => 0,
+            'title' => "インバイトオンリーヒドゥン",
+            'reading' => "いんばいとおんりーひどぅん",
+            'tag' => "アニメ",
+            'image_name' => "anime_default",
+            'is_item_add_limited' => 1,
+            'daily_vote_limit' => 0,
+            'total_vote_limit' => 0,
+            'vote_permission' => 'invite_only_hidden',
+            'user_id' => "user_99",
+            'created_at' => $now,
+            'updated_at' => $now,
+            'invite_code' => "INVITE99",
+        ]);
+        //'public_access','invite_only_view', 'invite_only_hidden'
     }
 }
