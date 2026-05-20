@@ -53,6 +53,14 @@ class StarterItemsTableSeeder extends Seeder
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
+            [
+                'item_id' => 8, // アイテム：ランキング作成チケット
+                'quantity' => 3,
+                'is_active' => true,
+                'trigger' => 'register',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
         ]);
     }
 }

@@ -76,6 +76,15 @@ class ItemsTableSeeder extends Seeder
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
+            [
+                'name' => 'ランキング作成チケット',
+                'description' => 'アイテム：ランキング作成に使用',
+                'type' => 'item',
+                'rarity' => 'common',
+                'image_name' => 'item02',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
         ]);
     }
 }

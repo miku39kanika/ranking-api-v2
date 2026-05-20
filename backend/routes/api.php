@@ -21,6 +21,11 @@ use App\Http\Controllers\BlockController;
 use App\Http\Controllers\ReportController;
 
 Route::middleware('auth:sanctum')->group(function () {
+   Route::middleware('throttle:60,1')->group(function () {
+      Route::post('/items/consume/ticket', [ItemController::class, 'consume_ticket']);
+      Route::post('/items/consume', [ItemController::class, 'consume']);
+   });
+
    Route::middleware('throttle:10,1')->group(function () {
       Route::post('/blocks', [BlockController::class, 'store']);
       Route::delete('/blocks/unblock', [BlockController::class, 'destroy']);

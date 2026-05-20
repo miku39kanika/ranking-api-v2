@@ -27,7 +27,7 @@ class GiftSeeder extends Seeder
             'expires_at' => Carbon::now()->addDays(30),
         ]);
         // =====================
-        // case 1(二つ目)：全員・常時（item）
+        // case 1(2つ目)：全員・常時（item_アイコン）
         // =====================
         Gift::create([
             'title' => 'DLありがとうございます！',
@@ -38,6 +38,22 @@ class GiftSeeder extends Seeder
             'reward_type' => 'item',
             'reward_code' => 6,
             'reward_amount' => 1,
+
+            'from_date' => null,
+            'expires_at' => Carbon::now()->addDays(30),
+        ]);
+        // =====================
+        // case 1(3つ目)：全員・常時（item_アイテム）
+        // =====================
+        Gift::create([
+            'title' => 'DLありがとうございます！',
+            'body' => "このアプリをDLしてくださりありがとうございます。限定アイテムのプレゼントとなります。",
+            'case' => 1,
+            'user_id' => null,
+
+            'reward_type' => 'item',
+            'reward_code' => 8, // ランキング作成チケット
+            'reward_amount' => 3,
 
             'from_date' => null,
             'expires_at' => Carbon::now()->addDays(30),
