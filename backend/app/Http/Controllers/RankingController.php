@@ -153,6 +153,8 @@ class RankingController extends Controller
                         ];
                     }),
                     'image_name' => $ranking->image_name,
+                    'image_type' => $ranking->image_type,
+                    'image_path' => $ranking->image_path,
                     'items' => [],
                 ];
             }),
@@ -203,6 +205,9 @@ class RankingController extends Controller
             'id' => $ranking->id,
             'title' => $ranking->title,
             'reading' => $ranking->reading,
+            'image_name' => $ranking->image_name,
+            'image_type' => $ranking->image_type,
+            'image_path' => $ranking->image_path,
             'items' => $ranking->items->map(function ($item) {
                 return [
                     'id' => $item->id,
@@ -296,6 +301,9 @@ class RankingController extends Controller
             'id' => $ranking->id,
             'title' => $ranking->title,
             'reading' => $ranking->reading,
+            'image_name' => $ranking->image_name,
+            'image_type' => $ranking->image_type,
+            'image_path' => $ranking->image_path,
             'is_liked' => 0,
             'tags' => $ranking->tags->map(function ($tag) {
                 return [
@@ -341,25 +349,53 @@ class RankingController extends Controller
     public function store(Request $request, ContentFilterService $filter)
     {
         Log::info('RankingController@store called');
+
+        Log::info($request->all());
+
+        Log::info($request->hasFile('image'));
+
+        Log::info($request->file('image'));
         $request->validate([
             'title' => 'required|string|max:30',
             'daily_vote_limit' => 'required|integer|min:1|max:100',
             'total_vote_limit' => 'required|integer|min:1|max:1000',
+        ]);
+        $request->validate([
+            'image' => 'nullable|image|max:5120',
         ]);
         if ($filter->containsNgWord($request->title)) {
             return response()->json([
                 'error' => 'NG_WORD'
             ], 422);
         }
+        $imagePath = null;
+        $imageType = 'asset';
+
+        if ($request->hasFile('image')) {
+
+            $imagePath = $request
+                ->file('image')
+                ->store('rankings', 'public');
+
+            $imageType = 'uploaded';
+        }
+
+
+
 
         $reading = app(ReadingService::class)->generate($request->title);
         $inviteCode =
             Str::upper(Str::random(8));
+
+        Log::info("CREATE START");
+
         $ranking = Ranking::create([
             'ranking_type' => 0,
             'title' => $request->title,
             'reading' => $reading,
             'image_name' => $request->image_name,
+            'image_type' => $imageType,
+            'image_path' => $imagePath,
             'is_item_add_limited' => $request->is_item_add_limited,
             'daily_vote_limit' => $request->daily_vote_limit,
             'total_vote_limit' => $request->total_vote_limit,
@@ -367,6 +403,8 @@ class RankingController extends Controller
             'user_id' => $request->user()->id,
             'invite_code' => $inviteCode,
         ]);
+
+        Log::info("CREATE SUCCESS");
         $ranking->tags()->sync($request->tag_ids);
 
         return response()->json([
@@ -374,6 +412,8 @@ class RankingController extends Controller
             'title' => $ranking->title,
             'reading' => $ranking->reading,
             'image_name' => $ranking->image_name,
+            'image_type' => $ranking->image_type,
+            'image_path' => $ranking->image_path,
             'created_at' => $ranking->created_at,
             'daily_vote_limit' => $ranking->daily_vote_limit,
             'total_vote_limit' => $ranking->total_vote_limit,
@@ -421,6 +461,8 @@ class RankingController extends Controller
                     'title' => $ranking->title,
                     'reading' => $ranking->reading,
                     'image_name' => $ranking->image_name,
+                    'image_type' => $ranking->image_type,
+                    'image_path' => $ranking->image_path,
                     'created_at' => $ranking->created_at,
                     'is_liked' => 0,
                     'tags' => $ranking->tags->map(function ($tag) {
@@ -487,6 +529,8 @@ class RankingController extends Controller
             'title' => $ranking->title,
             'reading' => $ranking->reading,
             'image_name' => $ranking->image_name,
+            'image_type' => $ranking->image_type,
+            'image_path' => $ranking->image_path,
             'created_at' => $ranking->created_at,
             'is_liked' => 0,
 

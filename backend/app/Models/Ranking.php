@@ -11,16 +11,18 @@ use App\Models\Like;
 class Ranking extends Model
 {
     protected $fillable = [
+        'ranking_type',
         'title',
         'reading',
-        'tag',
         'image_name',
+        'image_type',
+        'image_path',
         'is_item_add_limited',
         'daily_vote_limit',
         'total_vote_limit',
         'vote_permission',
         'user_id',
-        'invite_code'
+        'invite_code',
     ];
 
     public function items()
