@@ -14,8 +14,8 @@ class GiftSeeder extends Seeder
         // case 1：全員・常時（currency）
         // =====================
         Gift::create([
-            'title' => 'DLありがとうございます！',
-            'body' => "このアプリをDLしてくださりありがとうございます。オーブ×100のプレゼントとなります。",
+            'title' => 'DL感謝！：オーブ贈呈',
+            'body' => "アプリのDLありがとうございます。オーブ×100をプレゼント！",
             'case' => 1,
             'user_id' => null,
 
@@ -30,8 +30,8 @@ class GiftSeeder extends Seeder
         // case 1(2つ目)：全員・常時（item_アイコン）
         // =====================
         Gift::create([
-            'title' => 'DLありがとうございます！',
-            'body' => "このアプリをDLしてくださりありがとうございます。限定アイコンのプレゼントとなります。",
+            'title' => 'DL感謝！：限定アイコン贈呈',
+            'body' => "アプリのDLありがとうございます。限定アイコンをプレゼント！",
             'case' => 1,
             'user_id' => null,
 
@@ -46,8 +46,8 @@ class GiftSeeder extends Seeder
         // case 1(3つ目)：全員・常時（item_アイテム）
         // =====================
         Gift::create([
-            'title' => 'DLありがとうございます！',
-            'body' => "このアプリをDLしてくださりありがとうございます。限定アイテムのプレゼントとなります。",
+            'title' => 'DL感謝！：ランキング作成チケット贈呈',
+            'body' => "アプリのDLありがとうございます。ランキング作成チケット×3をプレゼント！",
             'case' => 1,
             'user_id' => null,
 

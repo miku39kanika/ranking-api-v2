@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('email', 255)->nullable()->unique();
             // 👇 ユーザー区分（課金ランク）
             $table->tinyInteger('plan_type')->default(0);
+            $table->timestamp('plan_expires_at')
+                ->nullable();
             // 0: 無料
             // 1: ライト課金
             // 2: プレミアム

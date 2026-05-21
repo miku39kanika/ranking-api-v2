@@ -363,50 +363,167 @@ class RankingController extends Controller
         $request->validate([
             'image' => 'nullable|image|max:5120',
         ]);
-        if ($filter->containsNgWord($request->title)) {
+
+        $userId = $request->user()->id;
+
+        // =====================
+        // ランキング作成コスト処理
+        // ticket優先
+        // なければorb100
+        // =====================
+
+        DB::beginTransaction();
+
+        try {
+
+            $ticketItems = DB::table('user_items')
+                ->where('user_id', $userId)
+                ->where('item_id', 8)
+                ->where('quantity', '>', 0)
+                ->orderByRaw('expires_at IS NULL')
+                ->orderBy('expires_at', 'asc')
+                ->get();
+
+            // =====================
+            // ticket消費
+            // =====================
+
+            if ($ticketItems->isNotEmpty()) {
+
+                $remaining = 1;
+
+                foreach ($ticketItems as $item) {
+
+                    if ($remaining <= 0) {
+                        break;
+                    }
+
+                    $consume = min(
+                        $item->quantity,
+                        $remaining
+                    );
+
+                    $newQuantity =
+                        $item->quantity - $consume;
+
+                    if ($newQuantity <= 0) {
+
+                        DB::table('user_items')
+                            ->where('id', $item->id)
+                            ->delete();
+                    } else {
+
+                        DB::table('user_items')
+                            ->where('id', $item->id)
+                            ->update([
+                                'quantity' => $newQuantity
+                            ]);
+                    }
+
+                    $remaining -= $consume;
+                }
+            } else {
+
+                // =====================
+                // orb消費
+                // =====================
+
+                $currency = DB::table('user_currencies')
+                    ->where('user_id', $userId)
+                    ->where('currency_id', 1)
+                    ->first();
+
+                if (!$currency || $currency->amount < 100) {
+
+                    DB::rollBack();
+
+                    return response()->json([
+                        'error' => 'NOT_ENOUGH_ORB'
+                    ], 400);
+                }
+
+                $newAmount = $currency->amount - 100;
+
+                if ($newAmount <= 0) {
+
+                    DB::table('user_currencies')
+                        ->where('id', $currency->id)
+                        ->delete();
+                } else {
+
+                    DB::table('user_currencies')
+                        ->where('id', $currency->id)
+                        ->update([
+                            'amount' => $newAmount
+                        ]);
+                }
+
+                DB::table('currency_histories')
+                    ->insert([
+                        'user_id' => $userId,
+                        'currency_id' => 1,
+                        'amount' => -100,
+                        'reason' => 'CREATE_RANKING',
+                        'note' => 'ランキング作成',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+            }
+
+
+            if ($filter->containsNgWord($request->title)) {
+                return response()->json([
+                    'error' => 'NG_WORD'
+                ], 422);
+            }
+            $imagePath = null;
+            $imageType = 'asset';
+
+            if ($request->hasFile('image')) {
+
+                $imagePath = $request
+                    ->file('image')
+                    ->store('rankings', 'public');
+
+                $imageType = 'uploaded';
+            }
+
+
+
+
+            $reading = app(ReadingService::class)->generate($request->title);
+            $inviteCode =
+                Str::upper(Str::random(8));
+
+            Log::info("CREATE START");
+
+            $ranking = Ranking::create([
+                'ranking_type' => 0,
+                'title' => $request->title,
+                'reading' => $reading,
+                'image_name' => $request->image_name,
+                'image_type' => $imageType,
+                'image_path' => $imagePath,
+                'is_item_add_limited' => $request->is_item_add_limited,
+                'daily_vote_limit' => $request->daily_vote_limit,
+                'total_vote_limit' => $request->total_vote_limit,
+                'vote_permission' => $request->vote_permission,
+                'user_id' => $request->user()->id,
+                'invite_code' => $inviteCode,
+            ]);
+            DB::commit();
+            Log::info("CREATE SUCCESS");
+            $ranking->tags()->sync($request->tag_ids);
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            Log::error($e);
+
             return response()->json([
-                'error' => 'NG_WORD'
-            ], 422);
+                'error' => 'CREATE_FAILED'
+            ], 500);
         }
-        $imagePath = null;
-        $imageType = 'asset';
-
-        if ($request->hasFile('image')) {
-
-            $imagePath = $request
-                ->file('image')
-                ->store('rankings', 'public');
-
-            $imageType = 'uploaded';
-        }
-
-
-
-
-        $reading = app(ReadingService::class)->generate($request->title);
-        $inviteCode =
-            Str::upper(Str::random(8));
-
-        Log::info("CREATE START");
-
-        $ranking = Ranking::create([
-            'ranking_type' => 0,
-            'title' => $request->title,
-            'reading' => $reading,
-            'image_name' => $request->image_name,
-            'image_type' => $imageType,
-            'image_path' => $imagePath,
-            'is_item_add_limited' => $request->is_item_add_limited,
-            'daily_vote_limit' => $request->daily_vote_limit,
-            'total_vote_limit' => $request->total_vote_limit,
-            'vote_permission' => $request->vote_permission,
-            'user_id' => $request->user()->id,
-            'invite_code' => $inviteCode,
-        ]);
-
-        Log::info("CREATE SUCCESS");
-        $ranking->tags()->sync($request->tag_ids);
-
         return response()->json([
             'id' => $ranking->id,
             'title' => $ranking->title,

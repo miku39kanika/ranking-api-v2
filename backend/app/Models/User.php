@@ -47,6 +47,14 @@ class User extends Authenticatable
         'banned_at' => 'datetime',
     ];
 
+    public function isPremium(): bool
+    {
+        return
+            $this->plan_type >= 1
+            && $this->plan_expires_at
+            && $this->plan_expires_at->isFuture();
+    }
+
     public function followings()
     {
         return $this->belongsToMany(

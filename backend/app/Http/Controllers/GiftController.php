@@ -73,7 +73,7 @@ class GiftController extends Controller
                     'user_id' => $gift->user_id,
                     'from_date' => $gift->from_date,
                     'expires_at' => $gift->expires_at,
-                    'created_at' => $gift->created_at,
+                    'created_at' => $gift->created_at?->format('Y-m-d'),
                     'is_received' => in_array($gift->id, $receivedGiftIds),
                 ];
             })

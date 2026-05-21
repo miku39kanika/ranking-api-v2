@@ -32,7 +32,18 @@ class AnnouncementController extends Controller
 
         Log::info('AnnouncementController@index called');
 
-        return response()->json($announcements);
+        return response()->json(
+            $announcements->map(function ($a) {
+                return [
+                    'id' => $a->id,
+                    'title' => $a->title,
+                    'body' => $a->body,
+                    'important' => $a->important,
+                    'send_at' => $a->send_at,
+                    'created_at' => $a->created_at?->format('Y-m-d'),
+                ];
+            })
+        );
     }
 
     // public function show($id)　後々indexでbody取得をやめるかも。その時のために残しておく。
