@@ -109,5 +109,21 @@ class GiftSeeder extends Seeder
             'from_date' => null,
             'expires_at' => Carbon::now()->addDays(14),
         ]);
+        // =====================
+        // case 1（全員・広告）
+        // =====================
+        Gift::create([
+            'title' => '動画広告を見て作成チケットGET!',
+            'body' => "動画広告を見てランキング作成チケットをGET！",
+            'case' => 1,
+            'user_id' => null, // 全員
+
+            'reward_type' => 'rewarded_ad',
+            'reward_code' => 8,
+            'reward_amount' => 1,
+
+            'from_date' => null,
+            'expires_at' => Carbon::now()->addDays(1),
+        ]);
     }
 }

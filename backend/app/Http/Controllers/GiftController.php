@@ -69,6 +69,7 @@ class GiftController extends Controller
                     'id' => $gift->id,
                     'title' => $gift->title,
                     'body' => $gift->body,
+                    'reward_type' => $gift->reward_type,
                     'case' => $gift->case,
                     'user_id' => $gift->user_id,
                     'from_date' => $gift->from_date,
