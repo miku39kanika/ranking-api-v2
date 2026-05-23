@@ -15,19 +15,45 @@ class ItemController extends Controller
     public function myIcons(Request $request)
     {
         Log::info('ItemController@myIcons called');
-        $userId = $request->user()->id;
 
-        $items = DB::table('user_items')
-            ->join('items', 'user_items.item_id', '=', 'items.id')
-            ->where('user_items.user_id', $userId)
-            ->where('user_items.quantity', '>', 0)
-            ->where('items.type', '=', 'icon')
+        $user = $request->user();
+        $userId = $user->id;
+
+        $query = DB::table('items')
+            ->where('items.type', '=', 'icon');
+
+        // =====================
+        // 制限分岐
+        // =====================
+
+        if (!in_array($user->plan_type, [2, 3])) {
+
+            // 通常ユーザー → 所持しているものだけ
+            $query->join('user_items', function ($join) use ($userId) {
+                $join->on('user_items.item_id', '=', 'items.id')
+                    ->where('user_items.user_id', '=', $userId)
+                    ->where('user_items.quantity', '>', 0);
+            });
+        } else {
+
+            // プラン2,3 → JOIN不要（全表示）
+            $query->leftJoin('user_items', function ($join) use ($userId) {
+                $join->on('user_items.item_id', '=', 'items.id')
+                    ->where('user_items.user_id', '=', $userId);
+            });
+        }
+
+        $items = $query
             ->select('items.id', 'items.name', 'items.image_name')
+            ->distinct()
             ->get();
+
         Log::info('myIcons result', [
             'user_id' => $userId,
+            'plan_type' => $user->plan_type,
             'items' => $items->toArray()
         ]);
+
         return response()->json($items);
     }
 

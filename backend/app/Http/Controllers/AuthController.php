@@ -20,6 +20,25 @@ class AuthController extends Controller
         // 既存ユーザー確認（同じ端末）
         $user = User::where('device_id', $request->device_id)->first();
 
+        // =====================
+        // 有料期限切れ補正
+        // =====================
+
+        if (
+            $user &&
+            $user->plan_type === 1 &&
+            $user->plan_expires_at &&
+            now()->greaterThan($user->plan_expires_at)
+        ) {
+
+            $user->update([
+                'plan_type' => 0,
+                'plan_expires_at' => null,
+            ]);
+
+            $user->refresh();
+        }
+
         // なければ作成
         if (!$user) {
             Log::info('guestcreated called');

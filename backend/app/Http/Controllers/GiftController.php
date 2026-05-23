@@ -160,19 +160,70 @@ class GiftController extends Controller
                 // =====================
                 case 'item':
 
-                    DB::table('user_items')
-                        ->updateOrInsert(
-                            [
-                                'user_id' => $userId,
-                                'item_id' => $gift->reward_code, // ←そのままID
-                            ],
-                            [
-                                'quantity' => DB::raw('quantity + ' . $gift->reward_amount),
-                                'expires_at' => null,
+                    $existingItem = DB::table('user_items')
+                        ->where('user_id', $userId)
+                        ->where('item_id', $gift->reward_code)
+                        ->where('expires_at', $gift->expires_at)
+                        ->first();
+
+                    if ($existingItem) {
+
+                        DB::table('user_items')
+                            ->where('id', $existingItem->id)
+                            ->update([
+                                'quantity' =>
+                                $existingItem->quantity + $gift->reward_amount,
+
                                 'updated_at' => now(),
+                            ]);
+                    } else {
+
+                        DB::table('user_items')
+                            ->insert([
+                                'user_id' => $userId,
+                                'item_id' => $gift->reward_code,
+                                'quantity' => $gift->reward_amount,
+                                'expires_at' => $gift->expires_at,
                                 'created_at' => now(),
-                            ]
-                        );
+                                'updated_at' => now(),
+                            ]);
+                    }
+
+                    break;
+
+                // =====================
+                // rewarded_ad
+                // =====================
+                case 'rewarded_ad':
+
+                    $existingItem = DB::table('user_items')
+                        ->where('user_id', $userId)
+                        ->where('item_id', 8)
+                        ->where('expires_at', $gift->expires_at)
+                        ->first();
+
+                    if ($existingItem) {
+
+                        DB::table('user_items')
+                            ->where('id', $existingItem->id)
+                            ->update([
+                                'quantity' =>
+                                $existingItem->quantity + 1,
+
+                                'updated_at' => now(),
+                            ]);
+                    } else {
+
+                        DB::table('user_items')
+                            ->insert([
+                                'user_id' => $userId,
+                                'item_id' => 8,
+                                'quantity' => 1,
+                                'expires_at' => $gift->expires_at,
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
+                    }
 
                     break;
             }

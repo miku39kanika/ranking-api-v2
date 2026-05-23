@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamp('plan_expires_at')
                 ->nullable();
             // 0: 無料
-            // 1: ライト課金
+            // 1: 有料
             // 2: プレミアム
             // 3: 管理者（とかでもOK）
             $table->string('icon_type')->nullable()->default('system');

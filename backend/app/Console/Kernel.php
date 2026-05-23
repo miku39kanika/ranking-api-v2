@@ -21,5 +21,8 @@ use App\Console\Commands\GenerateGameQuestions;
 
 //             $schedule->command('queue:work --stop-when-empty')
 //             ->everyMinute()->withoutOverlapping();
+
+            //     $schedule->command('plan:expire')
+            //    ->daily();
 //     }
 // };
