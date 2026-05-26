@@ -49,7 +49,10 @@ class GiftController extends Controller
             });
         });
 
-        $gifts = $query->latest()->get();
+        $gifts = $query
+            ->with('item') // ←追加
+            ->latest()
+            ->get();
 
         Log::info('GIFTS DEBUG', [
             'user_id' => $userId,
@@ -70,6 +73,8 @@ class GiftController extends Controller
                     'title' => $gift->title,
                     'body' => $gift->body,
                     'reward_type' => $gift->reward_type,
+                    'item_image_name' => $gift->item?->image_name,
+                    'item_name' => $gift->item?->name,
                     'case' => $gift->case,
                     'user_id' => $gift->user_id,
                     'from_date' => $gift->from_date,

@@ -28,7 +28,6 @@ return new class extends Migration
 
             // 有効/無効
             $table->boolean('is_active')->default(true);
-
             $table->timestamps();
         });
     }

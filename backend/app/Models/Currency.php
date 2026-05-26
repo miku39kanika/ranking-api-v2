@@ -12,6 +12,6 @@ class Currency extends Model
         'name',
         'icon',
         'description',
-        'is_active'
+        'is_active',
     ];
 }

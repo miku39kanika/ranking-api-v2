@@ -21,7 +21,15 @@ class RewardDailyCrowns extends Command
         $date = now()->subDay()->toDateString();
 
         // =====================
-        // ユーザーごとの獲得vote数
+        // 最新season取得
+        // =====================
+
+        $latestSeason = DB::table('user_currencies')
+            ->where('currency_id', 2)
+            ->max('season');
+
+        // =====================
+        // ランキング獲得票 reward
         // =====================
 
         $results = DB::table('votes')
@@ -49,16 +57,12 @@ class RewardDailyCrowns extends Command
                 continue;
             }
 
-            // =====================
-            // crown付与
-            // currency_id = 2
-            // =====================
-
             DB::table('user_currencies')
                 ->updateOrInsert(
                     [
                         'user_id' => $userId,
                         'currency_id' => 2,
+                        'season' => $latestSeason,
                     ],
                     [
                         'amount' => DB::raw(
@@ -69,10 +73,6 @@ class RewardDailyCrowns extends Command
                     ]
                 );
 
-            // =====================
-            // history
-            // =====================
-
             DB::table('currency_histories')
                 ->insert([
                     'user_id' => $userId,
@@ -80,6 +80,58 @@ class RewardDailyCrowns extends Command
                     'amount' => $amount,
                     'reason' => 'DAILY_VOTE_REWARD',
                     'note' => "daily votes: {$amount}",
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+        }
+
+        // =====================
+        // 投票回数 reward
+        // 1vote = 5 crown
+        // =====================
+
+        $voteRewards = DB::table('votes')
+            ->where('vote_date', $date)
+            ->select(
+                'user_identifier',
+                DB::raw('COUNT(id) as vote_count')
+            )
+            ->groupBy('user_identifier')
+            ->get();
+
+        foreach ($voteRewards as $row) {
+
+            $userId = $row->user_identifier;
+
+            $amount = $row->vote_count * 5;
+
+            if ($amount <= 0) {
+                continue;
+            }
+
+            DB::table('user_currencies')
+                ->updateOrInsert(
+                    [
+                        'user_id' => $userId,
+                        'currency_id' => 2,
+                        'season' => $latestSeason,
+                    ],
+                    [
+                        'amount' => DB::raw(
+                            'amount + ' . $amount
+                        ),
+                        'updated_at' => now(),
+                        'created_at' => now(),
+                    ]
+                );
+
+            DB::table('currency_histories')
+                ->insert([
+                    'user_id' => $userId,
+                    'currency_id' => 2,
+                    'amount' => $amount,
+                    'reason' => 'DAILY_CAST_REWARD',
+                    'note' => "daily cast votes: {$amount}",
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

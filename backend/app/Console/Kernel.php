@@ -24,5 +24,8 @@ use App\Console\Commands\GenerateGameQuestions;
 
             //     $schedule->command('plan:expire')
             //    ->daily();
+//             $schedule->command(
+//     'ranking:update-season-crowns'
+// )->dailyAt('05:00');
 //     }
 // };

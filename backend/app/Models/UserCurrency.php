@@ -9,6 +9,7 @@ class UserCurrency extends Model
     protected $fillable = [
         'user_id',
         'currency_id',
+        'season',
         'amount',
     ];
 

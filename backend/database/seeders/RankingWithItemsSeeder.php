@@ -11,6 +11,36 @@ class RankingWithItemsSeeder extends Seeder
     public function run(): void
     {
         $now = Carbon::now();
+        DB::table('rankings')->insert([
+            'id' => 1,
+            'ranking_type' => 1,
+            'title' => "公式：今月の獲得クラウンランキング",
+            'reading' => "こうしき：こんげつのかくとくくらうんらんきんぐ",
+            'image_name' => "official_default",
+            'is_item_add_limited' => 1,
+            'daily_vote_limit' => 0,
+            'total_vote_limit' => 0,
+            'vote_permission' => 'invite_only_view',
+            'user_id' => "user_99",
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+        $rankingId = DB::table('rankings')->insertGetId([
+            'id' => 2,
+            'ranking_type' => 1,
+            'title' => "公式：サンプルアンケート",
+            'reading' => "こうしき：さんぷるあんけーと",
+            'tag' => "公式",
+            'image_name' => "official_default",
+            'is_item_add_limited' => 0,
+            'daily_vote_limit' => 1,
+            'total_vote_limit' => 1,
+            'vote_permission' => 'public_access',
+            'user_id' => "user_99",
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
 
         // user_01 ~ user_10
         $userIds = [];
@@ -190,34 +220,8 @@ class RankingWithItemsSeeder extends Seeder
                 }
             }
         }
-        $rankingId = DB::table('rankings')->insertGetId([
-            'ranking_type' => 1,
-            'title' => "公式：サンプルアンケート",
-            'reading' => "こうしき：さんぷるあんけーと",
-            'tag' => "official",
-            'image_name' => "official1",
-            'is_item_add_limited' => 0,
-            'daily_vote_limit' => 1,
-            'total_vote_limit' => 1,
-            'vote_permission' => 'public_access',
-            'user_id' => "user_99",
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
-        $rankingId = DB::table('rankings')->insertGetId([
-            'ranking_type' => 1,
-            'title' => "公式：サンプルアンケート",
-            'reading' => "こうしき：さんぷるあんけーと",
-            'tag' => "official",
-            'image_name' => "official1",
-            'is_item_add_limited' => 1,
-            'daily_vote_limit' => 0,
-            'total_vote_limit' => 0,
-            'vote_permission' => 'invite_only_view',
-            'user_id' => "user_99",
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
+
+
 
         $rankingId = DB::table('rankings')->insertGetId([
             'ranking_type' => 0,

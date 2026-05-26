@@ -13,44 +13,117 @@ class CurrencyController extends Controller
     public function index(Request $request)
     {
         Log::info('CurrencyController@index called');
-        Log::info('USER CHECK', [
-            'auth' => $request->user(),
-            'header' => $request->header('Authorization')
-        ]);
+
         $userId = $request->user()->id;
+
         $currencies = UserCurrency::with('currency')
             ->where('user_id', $userId)
             ->get();
 
-        return response()->json($currencies->map(function ($item) {
-            return [
-                'code' => $item->currency->code,
-                'name' => $item->currency->name,
-                'amount' => $item->amount,
-            ];
-        }));
+        // crown以外
+        $normalCurrencies = $currencies
+            ->filter(fn($item) => $item->currency->code !== 'crown')
+            ->map(function ($item) {
+
+                return [
+                    'code' => $item->currency->code,
+                    'name' => $item->currency->name,
+                    'amount' => $item->amount,
+                ];
+            })
+            ->values();
+
+        // crownのみ
+        $crowns = $currencies
+            ->filter(fn($item) => $item->currency->code === 'crown');
+
+        // crown全シーズン合計
+        $totalCrown = $crowns->sum('amount');
+
+        // 最新season
+        $latestSeason = $crowns
+            ->max('season');
+
+        // 最新seasonのcrown合計
+        $latestSeasonAmount = $crowns
+            ->filter(
+                fn($item) =>
+                $item->season === $latestSeason
+            )
+            ->sum('amount');
+
+        // crown情報
+        $crownData = [
+            'code' => 'crown',
+            'name' => 'クラウン',
+
+            // 全シーズン合計
+            'amount' => $totalCrown,
+
+            // 最新シーズン
+            'latest_season' => $latestSeason,
+
+            // 最新シーズン量
+            'latest_season_amount' =>
+            $latestSeasonAmount,
+        ];
+
+        return response()->json([
+            ...$normalCurrencies,
+            $crownData
+        ]);
     }
 
     public function change(Request $request)
     {
         Log::info('CurrencyController@change called');
-        $userCurrency = UserCurrency::with('currency')
-            ->where('user_id', $request->user()->id)
-            ->whereHas('currency', function ($q) use ($request) {
-                $q->where('code', $request->code);
-            })
-            ->first();
 
-        if (!$userCurrency) {
+        $currency = Currency::where(
+            'code',
+            $request->code
+        )->first();
+
+        if (!$currency) {
+
             return response()->json([
                 'message' => 'Currency not found'
             ], 404);
         }
 
-        $newAmount = $userCurrency->amount + $request->amount;
+        // crown
+        if ($request->code === 'crown') {
+
+            $userCurrency = UserCurrency::firstOrCreate(
+                [
+                    'user_id' => $request->user()->id,
+                    'currency_id' => $currency->id,
+                    'season' => $request->season,
+                ],
+                [
+                    'amount' => 0
+                ]
+            );
+        } else {
+
+            // orbなど
+            $userCurrency = UserCurrency::firstOrCreate(
+                [
+                    'user_id' => $request->user()->id,
+                    'currency_id' => $currency->id,
+                    'season' => null,
+                ],
+                [
+                    'amount' => 0
+                ]
+            );
+        }
+
+        $newAmount =
+            $userCurrency->amount + $request->amount;
 
         // マイナス防止
         if ($newAmount < 0) {
+
             return response()->json([
                 'message' => 'Not enough currency'
             ], 400);

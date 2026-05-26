@@ -29,4 +29,13 @@ class Gift extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+    public function item()
+    {
+        return $this->belongsTo(Item::class, 'reward_code');
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class, 'reward_code');
+    }
 }

@@ -34,12 +34,12 @@ class CreateDailyLoginBonus extends Command
             'case' => 1,
 
             // reward
-            'reward_type' => 'currency',
-            'reward_code' => 1,
-            'reward_amount' => 10,
+            'reward_type' => 'item',
+            'reward_code' => 8,
+            'reward_amount' => 1,
 
             // 受け取り期限
-            'expires_at' => now()->addDay(),
+            'expires_at' => now(),
 
             'created_at' => now(),
             'updated_at' => now(),

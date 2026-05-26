@@ -19,6 +19,8 @@ use App\Http\Controllers\GiftController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\SeasonCrownRankingController;
 
 Route::middleware('auth:sanctum')->group(function () {
    Route::middleware('throttle:60,1')->group(function () {
@@ -28,6 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
    });
 
    Route::middleware('throttle:10,1')->group(function () {
+
       Route::post('/blocks', [BlockController::class, 'store']);
       Route::delete('/blocks/unblock', [BlockController::class, 'destroy']);
       Route::post('/likes/toggle', [LikeController::class, 'toggle']);
@@ -43,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
    });
    Route::middleware('throttle:2,1')->group(function () {
       Route::post('/reports', [ReportController::class, 'store']);
+      Route::post('/feedbacks', [FeedbackController::class, 'store']);
       Route::put('/personal-ranking/update', [PersonalRankingController::class, 'update']);
 
       Route::put('/users/update', [UserController::class, 'update']);
@@ -50,6 +54,13 @@ Route::middleware('auth:sanctum')->group(function () {
    Route::middleware('throttle:30,1')->group(function () {
       Route::post('/vote', [VoteController::class, 'vote']);
       Route::post('/gifts/receive', [GiftController::class, 'receive']);
+      Route::post('/items', [RankingItemController::class, 'store']);
+      Route::post('/items/{id}/alias', [RankingItemController::class, 'addAlias']);
+      Route::delete('/items/{id}/alias/{alias}', [RankingItemController::class, 'deleteAlias']);
+   });
+
+   Route::middleware('throttle:1,360')->group(function () {
+      Route::post('/game/reward', [GameController::class, 'reward']);
    });
 
    Route::get('/blocks/status', [BlockController::class, 'status']);
@@ -63,13 +74,18 @@ Route::middleware('auth:sanctum')->group(function () {
    Route::get('/rankings', [RankingController::class, 'index']);
    Route::post('/follow', [FollowController::class, 'follow']);
    Route::get('/ranking/invite/{inviteCode}', [RankingController::class, 'showByInviteCode']);
+   Route::get(
+      '/season-crown-rankings',
+      [SeasonCrownRankingController::class, 'index']
+   );
 });
+
+
+
 
 //sanctum認証不要なルート
 Route::middleware('throttle:10,1')->group(function () {
-   Route::post('/items', [RankingItemController::class, 'store']);
-   Route::post('/items/{id}/alias', [RankingItemController::class, 'addAlias']);
-   Route::delete('/items/{id}/alias/{alias}', [RankingItemController::class, 'deleteAlias']);
+
    Route::post('/auth/guest', [AuthController::class, 'guestLogin']);
    Route::get('/app/status', [AppController::class, 'status']);
    Route::get('/users/public/{publicId}', [UserController::class, 'findByPublicId']);

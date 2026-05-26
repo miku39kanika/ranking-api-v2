@@ -7,6 +7,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\UserCurrency;
+use App\Models\CurrencyHistory;
 
 class GameController extends Controller
 {
@@ -98,5 +100,42 @@ class GameController extends Controller
             })->values(),
             'threshold' => 0.5
         ];
+    }
+
+    public function reward(Request $request)
+    {
+        $validated = $request->validate([
+            'score' => 'required|integer|min:0'
+        ]);
+        //$reward = floor($validated['score'] / 10); 
+        $reward = floor($validated['score']);
+
+        // crown = currency_id 2
+        $userCurrency = UserCurrency::firstOrCreate(
+            [
+                'user_id' => $request->user()->id,
+                'currency_id' => 2,
+            ],
+            [
+                'amount' => 0
+            ]
+        );
+
+        $userCurrency->amount += $reward;
+        $userCurrency->save();
+
+        CurrencyHistory::create([
+            'user_id' => $request->user()->id,
+            'currency_id' => 2,
+            'amount' => $reward,
+            'reason' => 'game_reward',
+            'note' => 'score: ' . $validated['score'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'reward' => $reward,
+            'total' => $userCurrency->amount,
+        ]);
     }
 }

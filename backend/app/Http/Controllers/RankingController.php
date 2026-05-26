@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use App\Services\ReadingService;
 use App\Services\ContentFilterService;
 use Illuminate\Support\Str;
+use App\Models\Tag;
 
 class RankingController extends Controller
 {
@@ -129,7 +130,14 @@ class RankingController extends Controller
                     'COUNT(DISTINCT votes.user_identifier) DESC'
                 )
                 ->orderByDesc('rankings.id')
-                ->select('rankings.*');
+                ->select('rankings.*')
+                ->selectSub(function ($q) use ($userId) {
+
+                    $q->from('likes')
+                        ->selectRaw('COUNT(*) > 0')
+                        ->whereColumn('likes.ranking_id', 'rankings.id')
+                        ->where('likes.user_id', $userId);
+                }, 'is_liked');
         }
 
         $rankings = $query->paginate(20);
@@ -296,6 +304,87 @@ class RankingController extends Controller
         //             'message' => 'Forbidden'
         //         ], 403);
         //     }
+
+        // =====================
+        // 公式：今月の獲得クラウンランキング
+        // ranking_id = 1
+        // =====================
+
+        // if ($ranking->id === 1) {
+
+        //     // 最新season取得
+        //     $latestSeason = DB::table('season_crown_rankings')
+        //         ->max('season');
+
+        //     $items = DB::table('season_crown_rankings')
+        //         ->join(
+        //             'users',
+        //             'season_crown_rankings.user_id',
+        //             '=',
+        //             'users.id'
+        //         )
+        //         ->where(
+        //             'season_crown_rankings.season',
+        //             $latestSeason
+        //         )
+        //         ->orderByDesc('season_crown_rankings.crown_amount')
+        //         ->limit(100)
+        //         ->get([
+        //             'users.id as user_id',
+        //             'users.user_name',
+        //             'users.icon_type',
+        //             'users.icon_name',
+        //             'season_crown_rankings.crown_amount',
+        //         ]);
+
+        //     return response()->json([
+        //         'id' => $ranking->id,
+        //         'title' => $ranking->title,
+        //         'reading' => $ranking->reading,
+        //         'image_name' => $ranking->image_name,
+        //         'image_type' => $ranking->image_type,
+        //         'image_path' => $ranking->image_path,
+        //         'is_liked' => 0,
+
+        //         'tags' => $ranking->tags->map(function ($tag) {
+
+        //             return [
+        //                 'id' => $tag->id,
+        //                 'name' => $tag->name,
+        //             ];
+        //         }),
+
+        //         // 通常ランキングと同じ形式
+        //         'items' => $items->map(function ($item, $index) {
+
+        //             return [
+        //                 'id' => $index + 1,
+        //                 'name' => $item->user_name,
+        //                 'votes' => $item->crown_amount,
+        //                 'aliases' => [],
+        //                 'my_votes' => 0,
+        //                 'my_votes_today' => 0,
+
+        //                 // フロント用追加情報
+        //                 'user_id' => $item->user_id,
+        //                 'icon_type' => $item->icon_type,
+        //                 'icon_name' => $item->icon_name,
+        //             ];
+        //         }),
+
+        //         'creator' => null,
+
+        //         'is_item_add_limited' => true,
+
+        //         'can_vote' => false,
+
+        //         'daily_vote_limit' => 0,
+
+        //         'total_vote_limit' => 0,
+
+        //         'invite_code' => null,
+        //     ]);
+        // }
         /** @var Ranking|null $ranking */
         return response()->json([
             'id' => $ranking->id,
@@ -365,7 +454,23 @@ class RankingController extends Controller
         ]);
 
         $userId = $request->user()->id;
+        // =====================
+        // 公式タグ禁止
+        // =====================
 
+        $officialTagExists = Tag::whereIn(
+            'id',
+            $request->tag_ids ?? []
+        )
+            ->where('name', '公式')
+            ->exists();
+
+        if ($officialTagExists) {
+
+            return response()->json([
+                'error' => 'OFFICIAL_TAG_NOT_ALLOWED'
+            ], 403);
+        }
         // =====================
         // ランキング作成コスト処理
         // ticket優先

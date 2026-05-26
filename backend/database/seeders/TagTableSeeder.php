@@ -74,6 +74,10 @@ class TagTableSeeder extends Seeder
                 'name' => '本',
                 'tag_image_name' => 'book_default',
             ],
+            [
+                'name' => '公式',
+                'tag_image_name' => 'official_default',
+            ],
         ];
 
         foreach ($tags as $tag) {

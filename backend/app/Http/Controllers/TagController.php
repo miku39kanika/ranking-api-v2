@@ -9,7 +9,9 @@ class TagController extends Controller
     public function index()
     {
         return response()->json(
-            Tag::orderBy('name')->get()
+            Tag::where('name', '!=', '公式')
+                ->orderBy('name')
+                ->get()
         );
     }
 }

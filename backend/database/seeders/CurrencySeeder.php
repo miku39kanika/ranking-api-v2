@@ -7,12 +7,10 @@ use Illuminate\Support\Facades\DB;
 
 class CurrencySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         DB::table('currencies')->insert([
+
             [
                 'code' => 'orb',
                 'name' => 'オーブ',
@@ -22,6 +20,7 @@ class CurrencySeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+
             [
                 'code' => 'crown',
                 'name' => 'クラウン',

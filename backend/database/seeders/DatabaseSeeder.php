@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             AnnouncementSeeder::class,
             GiftSeeder::class,
             StarterItemsTableSeeder::class,
+            RankingTagTableSeeder::class,
+            SeasonCrownRankingsSeeder::class,
         ]);
     }
 }
