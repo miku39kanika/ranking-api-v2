@@ -17,3 +17,9 @@ Schedule::command('reward:daily-crowns')
 Schedule::command('queue:work --stop-when-empty')
     ->everyMinute()
     ->withoutOverlapping();
+
+Schedule::command('plan:expire')
+    ->daily();
+Schedule::command(
+    'ranking:update-season-crowns'
+)->dailyAt('05:00');
