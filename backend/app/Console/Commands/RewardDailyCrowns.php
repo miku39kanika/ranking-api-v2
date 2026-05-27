@@ -21,14 +21,6 @@ class RewardDailyCrowns extends Command
         $date = now()->subDay()->toDateString();
 
         // =====================
-        // 最新season取得
-        // =====================
-
-        $latestSeason = DB::table('user_currencies')
-            ->where('currency_id', 2)
-            ->max('season');
-
-        // =====================
         // ランキング獲得票 reward
         // =====================
 
@@ -57,21 +49,25 @@ class RewardDailyCrowns extends Command
                 continue;
             }
 
+            // なければ作成
             DB::table('user_currencies')
                 ->updateOrInsert(
                     [
                         'user_id' => $userId,
                         'currency_id' => 2,
-                        'season' => $latestSeason,
                     ],
                     [
-                        'amount' => DB::raw(
-                            'amount + ' . $amount
-                        ),
-                        'updated_at' => now(),
+                        'amount' => 0,
                         'created_at' => now(),
+                        'updated_at' => now(),
                     ]
                 );
+
+            // 加算
+            DB::table('user_currencies')
+                ->where('user_id', $userId)
+                ->where('currency_id', 2)
+                ->increment('amount', $amount);
 
             DB::table('currency_histories')
                 ->insert([
@@ -103,7 +99,7 @@ class RewardDailyCrowns extends Command
 
             $userId = $row->user_identifier;
 
-            $amount = $row->vote_count * 5;
+            $amount = $row->vote_count * 2;
 
             if ($amount <= 0) {
                 continue;
@@ -114,16 +110,18 @@ class RewardDailyCrowns extends Command
                     [
                         'user_id' => $userId,
                         'currency_id' => 2,
-                        'season' => $latestSeason,
                     ],
                     [
-                        'amount' => DB::raw(
-                            'amount + ' . $amount
-                        ),
-                        'updated_at' => now(),
+                        'amount' => 0,
                         'created_at' => now(),
+                        'updated_at' => now(),
                     ]
                 );
+
+            DB::table('user_currencies')
+                ->where('user_id', $userId)
+                ->where('currency_id', 2)
+                ->increment('amount', $amount);
 
             DB::table('currency_histories')
                 ->insert([

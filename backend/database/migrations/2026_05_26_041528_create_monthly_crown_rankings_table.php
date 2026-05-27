@@ -8,11 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('season_crown_rankings', function (Blueprint $table) {
+        Schema::create('monthly_crown_rankings', function (Blueprint $table) {
 
             $table->id();
 
-            $table->integer('season');
+            // 2026-05
+            $table->string('year_month');
 
             $table->string('user_id');
 
@@ -27,7 +28,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique([
-                'season',
+                'year_month',
                 'user_id',
                 'snapshot_date'
             ]);
@@ -37,7 +38,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists(
-            'season_crown_rankings'
+            'monthly_crown_rankings'
         );
     }
 };

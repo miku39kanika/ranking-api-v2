@@ -21,10 +21,6 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-            // crown用シーズン
-            // orbなどはnull
-            $table->integer('season')->nullable();
-
             $table->integer('amount')->default(0);
 
             $table->timestamps();
@@ -33,8 +29,7 @@ return new class extends Migration
             // の重複防止
             $table->unique([
                 'user_id',
-                'currency_id',
-                'season'
+                'currency_id'
             ]);
         });
     }

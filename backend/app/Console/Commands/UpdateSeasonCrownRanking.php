@@ -8,53 +8,70 @@ use Illuminate\Support\Facades\DB;
 class UpdateSeasonCrownRanking extends Command
 {
     protected $signature =
-    'ranking:update-season-crowns';
+    'ranking:update-monthly-crowns';
 
     protected $description =
-    'Update season crown rankings';
+    'Update monthly crown rankings';
 
     public function handle()
     {
         // =====================
-        // 最新season取得
+        // 今月
+        // 例: 2026-05
         // =====================
 
-        $latestSeason = DB::table('user_currencies')
-            ->max('season');
-
-        if (!$latestSeason) {
-
-            $this->info('season not found');
-
-            return;
-        }
+        $yearMonth = now()->format('Y-m');
 
         // =====================
-        // 最新seasonのcrown取得
+        // 今月開始
+        // =====================
+
+        $startOfMonth =
+            now()->startOfMonth();
+
+        // =====================
+        // 今月のクラウン獲得数集計
         // currency_id = 2
+        // amount > 0 のみ
         // =====================
 
-        $users = DB::table('user_currencies')
+        $users = DB::table('currency_histories')
+            ->select(
+                'user_id',
+                DB::raw('SUM(amount) as crown_amount')
+            )
             ->where('currency_id', 2)
-            ->where('season', $latestSeason)
-            ->orderByDesc('amount')
+            ->where('amount', '>', 0)
+            ->where(
+                'created_at',
+                '>=',
+                $startOfMonth
+            )
+            ->groupBy('user_id')
+            ->orderByDesc('crown_amount')
             ->get();
 
         $rank = 1;
 
         foreach ($users as $user) {
 
-            DB::table('season_crown_rankings')
+            DB::table('monthly_crown_rankings')
                 ->updateOrInsert(
                     [
-                        'season' => $latestSeason,
+                        'year_month' => $yearMonth,
+
                         'user_id' => $user->user_id,
+
                         'snapshot_date' => today(),
                     ],
                     [
-                        'crown_amount' => $user->amount,
+                        'crown_amount' =>
+                        (int) $user->crown_amount,
+
                         'rank' => $rank,
+
                         'updated_at' => now(),
+
                         'created_at' => now(),
                     ]
                 );
@@ -63,7 +80,7 @@ class UpdateSeasonCrownRanking extends Command
         }
 
         $this->info(
-            'season crown rankings updated'
+            'monthly crown rankings updated'
         );
     }
 }

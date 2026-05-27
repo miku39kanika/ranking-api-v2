@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class SeasonCrownRankingsSeeder extends Seeder
+class MonthlyCrownRankingsSeeder extends Seeder
 {
     public function run(): void
     {
@@ -14,7 +14,7 @@ class SeasonCrownRankingsSeeder extends Seeder
         for ($i = 1; $i <= 10; $i++) {
 
             $rows[] = [
-                'season' => 1,
+                'year_month' => '2026-05',
                 'user_id' => sprintf('user_%02d', $i),
                 'crown_amount' => rand(500, 5000),
                 'rank' => $i,
@@ -24,7 +24,7 @@ class SeasonCrownRankingsSeeder extends Seeder
             ];
         }
 
-        DB::table('season_crown_rankings')
+        DB::table('monthly_crown_rankings')
             ->insert($rows);
     }
 }

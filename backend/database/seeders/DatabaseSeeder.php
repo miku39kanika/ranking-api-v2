@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             GiftSeeder::class,
             StarterItemsTableSeeder::class,
             RankingTagTableSeeder::class,
-            SeasonCrownRankingsSeeder::class,
+            MonthlyCrownRankingsSeeder::class,
         ]);
     }
 }

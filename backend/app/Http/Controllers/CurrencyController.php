@@ -28,28 +28,60 @@ class CurrencyController extends Controller
                 return [
                     'code' => $item->currency->code,
                     'name' => $item->currency->name,
-                    'amount' => $item->amount,
+                    'amount' => (int) $item->amount,
                 ];
             })
             ->values();
 
-        // crownのみ
-        $crowns = $currencies
-            ->filter(fn($item) => $item->currency->code === 'crown');
+        // crown currency取得
+        $crownCurrency = Currency::where(
+            'code',
+            'crown'
+        )->first();
 
-        // crown全シーズン合計
-        $totalCrown = $crowns->sum('amount');
-
-        // 最新season
-        $latestSeason = $crowns
-            ->max('season');
-
-        // 最新seasonのcrown合計
-        $latestSeasonAmount = $crowns
-            ->filter(
-                fn($item) =>
-                $item->season === $latestSeason
+        // crown現在所持数
+        $currentCrown = UserCurrency::where(
+            'user_id',
+            $userId
+        )
+            ->where(
+                'currency_id',
+                $crownCurrency->id
             )
+            ->value('amount') ?? 0;
+
+        // 今月開始
+        $startOfMonth = now()->startOfMonth();
+
+        // 今月の取得数（マイナス除外）
+        $monthlyEarnedCrown =
+            CurrencyHistory::where(
+                'user_id',
+                $userId
+            )
+            ->where(
+                'currency_id',
+                $crownCurrency->id
+            )
+            ->where('amount', '>', 0)
+            ->where(
+                'created_at',
+                '>=',
+                $startOfMonth
+            )
+            ->sum('amount');
+
+        // 総取得数（マイナス除外）
+        $totalEarnedCrown =
+            CurrencyHistory::where(
+                'user_id',
+                $userId
+            )
+            ->where(
+                'currency_id',
+                $crownCurrency->id
+            )
+            ->where('amount', '>', 0)
             ->sum('amount');
 
         // crown情報
@@ -57,15 +89,14 @@ class CurrencyController extends Controller
             'code' => 'crown',
             'name' => 'クラウン',
 
-            // 全シーズン合計
-            'amount' => $totalCrown,
-
-            // 最新シーズン
-            'latest_season' => $latestSeason,
-
-            // 最新シーズン量
-            'latest_season_amount' =>
-            $latestSeasonAmount,
+            // 現在所持数
+            'amount' => (int) $currentCrown,
+            // 今月の取得数
+            'monthly_earned' =>
+            (int) $monthlyEarnedCrown,
+            // 総取得数
+            'total_earned' =>
+            (int) $totalEarnedCrown,
         ];
 
         return response()->json([
@@ -89,34 +120,16 @@ class CurrencyController extends Controller
                 'message' => 'Currency not found'
             ], 404);
         }
-
-        // crown
-        if ($request->code === 'crown') {
-
-            $userCurrency = UserCurrency::firstOrCreate(
-                [
-                    'user_id' => $request->user()->id,
-                    'currency_id' => $currency->id,
-                    'season' => $request->season,
-                ],
-                [
-                    'amount' => 0
-                ]
-            );
-        } else {
-
-            // orbなど
-            $userCurrency = UserCurrency::firstOrCreate(
-                [
-                    'user_id' => $request->user()->id,
-                    'currency_id' => $currency->id,
-                    'season' => null,
-                ],
-                [
-                    'amount' => 0
-                ]
-            );
-        }
+        // orbなど
+        $userCurrency = UserCurrency::firstOrCreate(
+            [
+                'user_id' => $request->user()->id,
+                'currency_id' => $currency->id,
+            ],
+            [
+                'amount' => 0
+            ]
+        );
 
         $newAmount =
             $userCurrency->amount + $request->amount;
