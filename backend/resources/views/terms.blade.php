@@ -1,35 +1,7 @@
-<!DOCTYPE html>
-<html lang="ja">
+@php
+use Illuminate\Support\Str;
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>利用規約</title>
-
-    <style>
-        body {
-            font-family: sans-serif;
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 16px;
-            line-height: 1.8;
-            color: #222;
-        }
-
-        h1,
-        h2,
-        h3 {
-            margin-top: 32px;
-        }
-
-        hr {
-            margin: 32px 0;
-        }
-    </style>
-</head>
-
-<body>
-
+$markdown = <<<MD
     # なんでも！ランキング 利用規約
 
     最終更新日：2026年5月27日
@@ -146,11 +118,43 @@
 
     メールアドレス：[miku39kanika@gmail.com](mailto:miku39kanika@gmail.com)
 
-    ---
+    MD;
+    @endphp
 
+    <!DOCTYPE html>
+    <html lang="ja">
 
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>利用規約</title>
 
+        <style>
+            body {
+                font-family: sans-serif;
+                max-width: 800px;
+                margin: 40px auto;
+                padding: 16px;
+                line-height: 1.8;
+                color: #222;
+            }
 
-</body>
+            h1,
+            h2,
+            h3 {
+                margin-top: 32px;
+            }
 
-</html>
+            hr {
+                margin: 32px 0;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        {!! Str::markdown($markdown) !!}
+
+    </body>
+
+    </html>
