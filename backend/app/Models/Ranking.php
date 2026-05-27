@@ -36,7 +36,7 @@ class Ranking extends Model
             User::class,
             'user_id',
             'id'
-        );
+        )->where('is_deleted', 0);
     }
     public function comments()
     {

@@ -18,7 +18,9 @@ class AuthController extends Controller
     {
         Log::info('guestLogin called');
         // 既存ユーザー確認（同じ端末）
-        $user = User::where('device_id', $request->device_id)->first();
+        $user = User::where('device_id', $request->device_id)
+            ->where('is_deleted', 0)
+            ->first();
 
         // =====================
         // 有料期限切れ補正

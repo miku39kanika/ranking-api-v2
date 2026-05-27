@@ -50,6 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
       Route::put('/personal-ranking/update', [PersonalRankingController::class, 'update']);
 
       Route::put('/users/update', [UserController::class, 'update']);
+      Route::post('/users/delete', [UserController::class, 'delete']);
    });
    Route::middleware('throttle:30,1')->group(function () {
       Route::post('/vote', [VoteController::class, 'vote']);

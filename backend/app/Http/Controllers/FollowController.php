@@ -62,12 +62,17 @@ class FollowController extends Controller
     public function counts($userId)
     {
         Log::info('FollowController@counts called');
+
         $following = DB::table('follows')
-            ->where('follower_id', $userId)
+            ->join('users', 'follows.followed_id', '=', 'users.id')
+            ->where('follows.follower_id', $userId)
+            ->where('users.is_deleted', 0)
             ->count();
 
         $followers = DB::table('follows')
-            ->where('followed_id', $userId)
+            ->join('users', 'follows.follower_id', '=', 'users.id')
+            ->where('follows.followed_id', $userId)
+            ->where('users.is_deleted', 0)
             ->count();
 
         return response()->json([
@@ -82,6 +87,7 @@ class FollowController extends Controller
         $users = DB::table('follows')
             ->join('users', 'follows.followed_id', '=', 'users.id')
             ->where('follows.follower_id', $userId)
+            ->where('users.is_deleted', 0)
             ->select('users.*')
             ->get();
 
@@ -94,6 +100,7 @@ class FollowController extends Controller
         $users = DB::table('follows')
             ->join('users', 'follows.follower_id', '=', 'users.id')
             ->where('follows.followed_id', $userId)
+            ->where('users.is_deleted', 0)
             ->select('users.*')
             ->get();
 

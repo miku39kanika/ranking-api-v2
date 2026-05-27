@@ -325,4 +325,49 @@ class UserController extends Controller
             'success' => true
         ]);
     }
+    public function delete(Request $request)
+    {
+        Log::info('UserController@delete called');
+
+        $user = $request->user(); // Sanctum認証ユーザー
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'unauthorized'
+            ], 401);
+        }
+
+        // すでに削除済みチェック（任意）
+        if ($user->is_deleted) {
+            return response()->json([
+                'message' => 'already deleted'
+            ], 400);
+        }
+
+        try {
+
+            DB::transaction(function () use ($user) {
+
+                $user->is_deleted = 1;
+                $user->email = null; // メールアドレスは削除
+                $user->save();
+
+                // 👇 必要ならトークン無効化（ログアウト扱い）
+                $user->tokens()->delete();
+            });
+
+            return response()->json([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+
+            Log::error('DELETE USER FAILED', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'message' => 'server error'
+            ], 500);
+        }
+    }
 }

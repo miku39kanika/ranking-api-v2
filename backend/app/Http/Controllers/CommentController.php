@@ -29,7 +29,9 @@ class CommentController extends Controller
 
             // ブロックユーザー除外
             ->whereNotIn('user_id', $blockedUserIds)
-
+            ->whereHas('user', function ($q) {
+                $q->where('is_deleted', 0);
+            })
             ->orderBy('created_at', 'desc')
             ->get();
 

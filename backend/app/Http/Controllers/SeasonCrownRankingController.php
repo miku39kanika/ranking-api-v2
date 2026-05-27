@@ -36,12 +36,10 @@ class SeasonCrownRankingController extends Controller
         // =====================
 
         $items = DB::table('monthly_crown_rankings')
-            ->join(
-                'users',
-                'monthly_crown_rankings.user_id',
-                '=',
-                'users.id'
-            )
+            ->join('users', function ($join) {
+                $join->on('monthly_crown_rankings.user_id', '=', 'users.id')
+                    ->where('users.is_deleted', 0);
+            })
             ->where(
                 'monthly_crown_rankings.year_month',
                 $latestYearMonth
