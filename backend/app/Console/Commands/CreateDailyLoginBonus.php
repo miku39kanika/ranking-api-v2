@@ -62,7 +62,7 @@ class CreateDailyLoginBonus extends Command
             'reward_amount' => 1,
 
             'from_date' => null,
-            'expires_at' => Carbon::now()->endOfDay(),,
+            'expires_at' => Carbon::now()->endOfDay(),
 
             'created_at' => now(),
             'updated_at' => now(),
