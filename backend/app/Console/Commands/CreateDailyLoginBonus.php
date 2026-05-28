@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Gift;
+use Carbon\Carbon;
 
 class CreateDailyLoginBonus extends Command
 {
@@ -14,37 +15,59 @@ class CreateDailyLoginBonus extends Command
     public function handle()
     {
         // =====================
-        // 今日すでに存在するか
+        // 今日のログインボーナス存在確認
         // =====================
 
         $exists = Gift::where('title', 'Login Bonus')
             ->whereDate('created_at', today())
             ->exists();
 
-        if ($exists) {
+        if (!$exists) {
 
-            $this->info('already exists');
+            Gift::create([
+                'title' => 'Login Bonus',
+                'body' => 'ログインボーナスです！',
+                'case' => 1,
 
-            return;
+                // reward
+                'reward_type' => 'item',
+                'reward_code' => 8,
+                'reward_amount' => 1,
+
+                // 受け取り期限
+                'expires_at' => now()->endOfDay(),
+
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $this->info('login bonus created');
         }
 
-        Gift::create([
-            'title' => 'Login Bonus',
-            'body' => 'ログインボーナスです！',
-            'case' => 1,
+        // =====================
+        // 広告視聴giftを作り直す
+        // =====================
 
-            // reward
-            'reward_type' => 'item',
+        Gift::where('title', '動画広告を見て作成チケットGET!')
+            ->delete();
+
+        Gift::create([
+            'title' => '動画広告を見て作成チケットGET!',
+            'body' => '動画広告を見てランキング作成チケットをGET！',
+            'case' => 1,
+            'user_id' => null,
+
+            'reward_type' => 'rewarded_ad',
             'reward_code' => 8,
             'reward_amount' => 1,
 
-            // 受け取り期限
-            'expires_at' => now(),
+            'from_date' => null,
+            'expires_at' => Carbon::now()->endOfDay(),,
 
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        $this->info('login bonus created');
+        $this->info('rewarded ad gift recreated');
     }
 }
