@@ -43,13 +43,14 @@ Route::middleware('auth:sanctum')->group(function () {
       Route::post('/user/transfer', [UserController::class, 'transferAccount']);
       Route::post('/user/transfer/send-code', [UserController::class, 'sendTransferCode']);
       Route::post('/rankings', [RankingController::class, 'store']);
+      Route::put('/users/update', [UserController::class, 'update']);
    });
    Route::middleware('throttle:2,1')->group(function () {
       Route::post('/reports', [ReportController::class, 'store']);
       Route::post('/feedbacks', [FeedbackController::class, 'store']);
       Route::put('/personal-ranking/update', [PersonalRankingController::class, 'update']);
 
-      Route::put('/users/update', [UserController::class, 'update']);
+
       Route::post('/users/delete', [UserController::class, 'delete']);
    });
    Route::middleware('throttle:30,1')->group(function () {
