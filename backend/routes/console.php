@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schedule;
 
 // デイリーゲーム生成
 Schedule::command('game:generate')
-    ->dailyAt('00:00')
+    ->dailyAt('05:00')
     ->withoutOverlapping();
 
 // ログインボーナスgift生成
@@ -14,7 +14,7 @@ Schedule::command('gift:create-login-bonus')
 
 // デイリーcrown配布
 Schedule::command('reward:daily-crowns')
-    ->dailyAt('00:00')
+    ->dailyAt('02:00')
     ->withoutOverlapping();
 
 // 月間crownランキング更新
