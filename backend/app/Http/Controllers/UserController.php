@@ -134,8 +134,33 @@ class UserController extends Controller
             $user->invited_by = $inviter->id;
             $user->save();
             $user->refresh();
+            // =====================
+            // 招待成立後、相互フォローにする
+            // =====================
+            // 招待された人 → 招待した人
+            DB::table('follows')->updateOrInsert(
+                [
+                    'follower_id' => $user->id,
+                    'followed_id' => $inviter->id,
+                ],
+                [
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
+            // 招待した人 → 招待された人
+            DB::table('follows')->updateOrInsert(
+                [
+                    'follower_id' => $inviter->id,
+                    'followed_id' => $user->id,
+                ],
+                [
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
             Gift::create([
-                'title' => '招待報酬',
+                'title' => '招待報酬(オーブ×500)',
                 'body' => '招待限定報酬です！招待コードを入力してくれてありがとうございます！',
                 'case' => 3,
                 'user_id' => $user->id, // ←招待された人
@@ -146,7 +171,7 @@ class UserController extends Controller
                 'expires_at' => now()->addDays(14),
             ]);
             Gift::create([
-                'title' => '招待報酬',
+                'title' => '招待報酬(ランキング作成チケット×3)',
                 'body' => '招待限定報酬です！招待コードを入力してくれてありがとうございます！',
                 'case' => 3,
                 'user_id' => $user->id, // ←招待された人
@@ -157,7 +182,7 @@ class UserController extends Controller
                 'expires_at' => now()->addDays(14),
             ]);
             Gift::create([
-                'title' => '招待報酬',
+                'title' => '招待報酬(オーブ×300)',
                 'body' => 'あなたが招待した人がアプリへやってきました！招待ありがとうございます！',
                 'case' => 3,
                 'user_id' => $inviter->id, // ←招待した人
@@ -170,7 +195,7 @@ class UserController extends Controller
                 'expires_at' => now()->addDays(14),
             ]);
             Gift::create([
-                'title' => '招待報酬',
+                'title' => '招待報酬(ランキング作成チケット×2)',
                 'body' => 'あなたが招待した人がアプリへやってきました！招待ありがとうございます！',
                 'case' => 3,
                 'user_id' => $inviter->id, // ←招待した人
@@ -190,7 +215,7 @@ class UserController extends Controller
 
             if (!$alreadyHasIconGift) {
                 Gift::create([
-                    'title' => '招待報酬',
+                    'title' => '招待報酬(限定アイコン)',
                     'body' => 'あなたが招待した人がアプリへやってきました！招待ありがとうございます！ベータ版のみの限定アイコンをプレゼント！',
                     'case' => 3,
                     'user_id' => $inviter->id,
@@ -200,7 +225,7 @@ class UserController extends Controller
                     'reward_amount' => 1,
 
                     'from_date' => null,
-                    'expires_at' => now()->addDays(14),
+                    'expires_at' => null,
                 ]);
             }
         });
@@ -369,6 +394,8 @@ class UserController extends Controller
             'success' => true
         ]);
     }
+
+
     public function delete(Request $request)
     {
         Log::info('UserController@delete called');
