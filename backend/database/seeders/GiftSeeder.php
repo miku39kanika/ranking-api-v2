@@ -36,7 +36,23 @@ class GiftSeeder extends Seeder
             'user_id' => null,
 
             'reward_type' => 'item',
-            'reward_code' => 6,
+            'reward_code' => 27,
+            'reward_amount' => 1,
+
+            'from_date' => null,
+            'expires_at' => Carbon::now()->addDays(30),
+        ]);
+        // =====================
+        // case 1(2つ目)：全員・常時（item_アイコン）
+        // =====================
+        Gift::create([
+            'title' => 'ベータ版DL感謝！：限定アイコン贈呈',
+            'body' => "アプリのDLありがとうございます。ベータ版参加者のみが貰える限定アイコンをプレゼント！",
+            'case' => 1,
+            'user_id' => null,
+
+            'reward_type' => 'item',
+            'reward_code' => 25,
             'reward_amount' => 1,
 
             'from_date' => null,
@@ -123,7 +139,7 @@ class GiftSeeder extends Seeder
             'reward_amount' => 1,
 
             'from_date' => null,
-            'expires_at' => Carbon::now()->addDays(1),
+            'expires_at' => Carbon::now(),
         ]);
     }
 }

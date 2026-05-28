@@ -141,8 +141,19 @@ class UserController extends Controller
                 'case' => 3,
                 'user_id' => $user->id, // ←招待された人
                 'reward_type' => 'currency',
-                'reward_code' => 2,
-                'reward_amount' => 50,
+                'reward_code' => 1,
+                'reward_amount' => 500,
+                'from_date' => null,
+                'expires_at' => now()->addDays(14),
+            ]);
+            Gift::create([
+                'title' => '招待報酬',
+                'body' => '招待限定報酬です！招待コードを入力してくれてありがとうございます！',
+                'case' => 3,
+                'user_id' => $user->id, // ←招待された人
+                'reward_type' => 'item',
+                'reward_code' => 8,
+                'reward_amount' => 3,
                 'from_date' => null,
                 'expires_at' => now()->addDays(14),
             ]);
@@ -153,12 +164,46 @@ class UserController extends Controller
                 'user_id' => $inviter->id, // ←招待した人
 
                 'reward_type' => 'currency',
-                'reward_code' => 2,
-                'reward_amount' => 50,
+                'reward_code' => 1,
+                'reward_amount' => 300,
 
                 'from_date' => null,
                 'expires_at' => now()->addDays(14),
             ]);
+            Gift::create([
+                'title' => '招待報酬',
+                'body' => 'あなたが招待した人がアプリへやってきました！招待ありがとうございます！',
+                'case' => 3,
+                'user_id' => $inviter->id, // ←招待した人
+
+                'reward_type' => 'item',
+                'reward_code' => 8,
+                'reward_amount' => 2,
+
+                'from_date' => null,
+                'expires_at' => now()->addDays(14),
+            ]);
+
+            $alreadyHasIconGift = Gift::where('user_id', $inviter->id)
+                ->where('reward_type', 'item')
+                ->where('reward_code', 24)
+                ->exists();
+
+            if (!$alreadyHasIconGift) {
+                Gift::create([
+                    'title' => '招待報酬',
+                    'body' => 'あなたが招待した人がアプリへやってきました！招待ありがとうございます！ベータ版のみの限定アイコンをプレゼント！',
+                    'case' => 3,
+                    'user_id' => $inviter->id,
+
+                    'reward_type' => 'item',
+                    'reward_code' => 24,
+                    'reward_amount' => 1,
+
+                    'from_date' => null,
+                    'expires_at' => now()->addDays(14),
+                ]);
+            }
         });
 
         return response()->json($user);
