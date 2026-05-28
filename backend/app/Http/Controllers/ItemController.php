@@ -48,12 +48,6 @@ class ItemController extends Controller
             ->distinct()
             ->get();
 
-        Log::info('myIcons result', [
-            'user_id' => $userId,
-            'plan_type' => $user->plan_type,
-            'items' => $items->toArray()
-        ]);
-
         return response()->json($items);
     }
 
@@ -76,21 +70,13 @@ class ItemController extends Controller
                 'user_items.expires_at'
             )
             ->get();
-        Log::info('myItems result', [
-            'user_id' => $userId,
-            'items' => $items->toArray()
-        ]);
+
         return response()->json($items);
     }
 
     public function consume(Request $request)
     {
         Log::info('ItemController@consume called');
-        Log::info('consume request', [
-            'user_id' => $request->user()->id,
-            'item_id' => $request->item_id,
-            'amount' => $request->amount,
-        ]);
         $request->validate([
             'item_id' => 'required|integer',
             'amount' => 'required|integer|min:1',
@@ -185,168 +171,4 @@ class ItemController extends Controller
             'success' => true
         ]);
     }
-
-    // public function consume_ticket(Request $request)
-    // {
-    //     Log::info('ItemController@consume_ticket called');
-
-    //     $userId = $request->user()->id;
-
-    //     $remaining = 1;
-
-    //     $items = DB::table('user_items')
-    //         ->where('user_id', $userId)
-    //         ->where('item_id', 8)
-    //         ->where('quantity', '>', 0)
-    //         ->orderByRaw('expires_at IS NULL')
-    //         ->orderBy('expires_at', 'asc')
-    //         ->get();
-
-    //     if ($items->isEmpty()) {
-
-    //         return response()->json([
-    //             'error' => 'ITEM_NOT_FOUND'
-    //         ], 404);
-    //     }
-
-    //     DB::beginTransaction();
-
-    //     try {
-
-    //         foreach ($items as $item) {
-
-    //             if ($remaining <= 0) {
-    //                 break;
-    //             }
-
-    //             $consume = min(
-    //                 $item->quantity,
-    //                 $remaining
-    //             );
-
-    //             $newQuantity =
-    //                 $item->quantity - $consume;
-
-    //             if ($newQuantity <= 0) {
-
-    //                 DB::table('user_items')
-    //                     ->where('id', $item->id)
-    //                     ->delete();
-    //             } else {
-
-    //                 DB::table('user_items')
-    //                     ->where('id', $item->id)
-    //                     ->update([
-    //                         'quantity' => $newQuantity
-    //                     ]);
-    //             }
-
-    //             $remaining -= $consume;
-    //         }
-
-    //         DB::commit();
-    //     } catch (\Exception $e) {
-
-    //         DB::rollBack();
-
-    //         Log::error($e);
-
-    //         return response()->json([
-    //             'error' => 'CONSUME_FAILED'
-    //         ], 500);
-    //     }
-
-    //     return response()->json([
-    //         'success' => true
-    //     ]);
-    // }
-
-    // public function consume_orb(Request $request)
-    // {
-    //     Log::info('ItemController@consume_orb called');
-
-    //     $userId = $request->user()->id;
-
-    //     // 固定
-    //     $consumeAmount = 100;
-
-    //     // =====================
-    //     // orb取得
-    //     // =====================
-
-    //     $currency = DB::table('user_currencies')
-    //         ->where('user_id', $userId)
-    //         ->where('currency_id', 1)
-    //         ->first();
-
-    //     if (!$currency) {
-
-    //         return response()->json([
-    //             'error' => 'ORB_NOT_FOUND'
-    //         ], 404);
-    //     }
-
-    //     // =====================
-    //     // 所持数チェック
-    //     // =====================
-
-    //     if ($currency->amount < $consumeAmount) {
-
-    //         return response()->json([
-    //             'error' => 'NOT_ENOUGH_ORB'
-    //         ], 400);
-    //     }
-
-    //     DB::beginTransaction();
-
-    //     try {
-
-    //         $newAmount =
-    //             $currency->amount - $consumeAmount;
-
-    //         if ($newAmount <= 0) {
-
-    //             DB::table('user_currencies')
-    //                 ->where('id', $currency->id)
-    //                 ->delete();
-    //         } else {
-
-    //             DB::table('user_currencies')
-    //                 ->where('id', $currency->id)
-    //                 ->update([
-    //                     'amount' => $newAmount
-    //                 ]);
-    //         }
-
-    //         // =====================
-    //         // history
-    //         // =====================
-
-    //         DB::table('currency_histories')
-    //             ->insert([
-    //                 'user_id' => $userId,
-    //                 'currency_id' => 1,
-    //                 'amount' => -100,
-    //                 'reason' => 'CREATE_RANKING',
-    //                 'note' => 'ランキング作成',
-    //                 'created_at' => now(),
-    //                 'updated_at' => now(),
-    //             ]);
-
-    //         DB::commit();
-    //     } catch (\Exception $e) {
-
-    //         DB::rollBack();
-
-    //         Log::error($e);
-
-    //         return response()->json([
-    //             'error' => 'CONSUME_FAILED'
-    //         ], 500);
-    //     }
-
-    //     return response()->json([
-    //         'success' => true
-    //     ]);
-    // }
 }

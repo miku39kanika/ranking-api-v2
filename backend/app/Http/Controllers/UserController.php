@@ -24,7 +24,6 @@ class UserController extends Controller
                 'message' => 'User not found'
             ], 404);
         }
-        Log::info('USER', ['user' => $user]);
         return response()->json([
             'id' => (string) $user->id,
             'public_id' => $user->public_id,

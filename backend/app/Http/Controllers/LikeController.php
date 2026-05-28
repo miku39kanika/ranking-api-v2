@@ -40,14 +40,4 @@ class LikeController extends Controller
             'liked' => true
         ]);
     }
-
-    // 📦 ユーザーのいいね一覧
-    // public function index($user_id)
-    // {
-    //     Log::info('LikeController@index called');
-    //     $likes = Like::where('user_id', $user_id)
-    //         ->pluck('ranking_id');
-
-    //     return response()->json($likes);
-    // }
 }

@@ -23,41 +23,29 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\SeasonCrownRankingController;
 
 Route::middleware('auth:sanctum')->group(function () {
-   Route::middleware('throttle:60,1')->group(function () {
-      // Route::post('/items/consume/ticket', [ItemController::class, 'consume_ticket']);
-      // Route::post('/items/consume/orb', [ItemController::class, 'consume_orb']);
-      Route::post('/items/consume', [ItemController::class, 'consume']);
-      Route::put('/users/update', [UserController::class, 'update']);
-      Route::put('/personal-ranking/update', [PersonalRankingController::class, 'update']);
-   });
-
-   Route::middleware('throttle:10,1')->group(function () {
-
-      Route::post('/blocks', [BlockController::class, 'store']);
-      Route::delete('/blocks/unblock', [BlockController::class, 'destroy']);
-      Route::post('/likes/toggle', [LikeController::class, 'toggle']);
-      Route::post('/comments', [CommentController::class, 'store']);
-      Route::post('/currency/change', [CurrencyController::class, 'change']);
-      Route::post('user/invite', [UserController::class, 'applyInvite']);
-      Route::post('user/email', [UserController::class, 'updateEmail']);
-      Route::post('/user/email/send-code', [UserController::class, 'sendVerifyCode']);
-      Route::post('/user/email/verify', [UserController::class, 'verifyEmail']);
-      Route::post('/user/transfer', [UserController::class, 'transferAccount']);
-      Route::post('/user/transfer/send-code', [UserController::class, 'sendTransferCode']);
-      Route::post('/rankings', [RankingController::class, 'store']);
-   });
-   Route::middleware('throttle:5,1')->group(function () {
-      Route::post('/reports', [ReportController::class, 'store']);
-      Route::post('/feedbacks', [FeedbackController::class, 'store']);
-      Route::post('/users/delete', [UserController::class, 'delete']);
-   });
-   Route::middleware('throttle:30,1')->group(function () {
-      Route::post('/vote', [VoteController::class, 'vote']);
-      Route::post('/gifts/receive', [GiftController::class, 'receive']);
-      Route::post('/items', [RankingItemController::class, 'store']);
-      Route::post('/items/{id}/alias', [RankingItemController::class, 'addAlias']);
-      Route::delete('/items/{id}/alias/{alias}', [RankingItemController::class, 'deleteAlias']);
-   });
+   Route::post('/items/consume', [ItemController::class, 'consume'])->middleware('throttle:10,1');
+   Route::put('/users/update', [UserController::class, 'update'])->middleware('throttle:10,1');
+   Route::put('/personal-ranking/update', [PersonalRankingController::class, 'update'])->middleware('throttle:3,1');
+   Route::post('/rankings', [RankingController::class, 'store'])->middleware('throttle:3,1');
+   Route::post('/blocks', [BlockController::class, 'store'])->middleware('throttle:5,1');
+   Route::delete('/blocks/unblock', [BlockController::class, 'destroy'])->middleware('throttle:5,1');
+   Route::post('/likes/toggle', [LikeController::class, 'toggle'])->middleware('throttle:30,1');
+   Route::post('/comments', [CommentController::class, 'store'])->middleware('throttle:20,1');
+   Route::post('/currency/change', [CurrencyController::class, 'change'])->middleware('throttle:30,1');
+   Route::post('user/invite', [UserController::class, 'applyInvite'])->middleware('throttle:5,1');
+   Route::post('user/email', [UserController::class, 'updateEmail'])->middleware('throttle:3,1');
+   Route::post('/user/email/send-code', [UserController::class, 'sendVerifyCode'])->middleware('throttle:3,1');
+   Route::post('/user/email/verify', [UserController::class, 'verifyEmail'])->middleware('throttle:3,1');
+   Route::post('/user/transfer', [UserController::class, 'transferAccount'])->middleware('throttle:5,1');
+   Route::post('/user/transfer/send-code', [UserController::class, 'sendTransferCode'])->middleware('throttle:5,1');;
+   Route::post('/reports', [ReportController::class, 'store'])->middleware('throttle:3,1');
+   Route::post('/feedbacks', [FeedbackController::class, 'store'])->middleware('throttle:3,1');
+   Route::post('/users/delete', [UserController::class, 'delete'])->middleware('throttle:2,1');
+   Route::post('/vote', [VoteController::class, 'vote'])->middleware('throttle:60,1');
+   Route::post('/gifts/receive', [GiftController::class, 'receive'])->middleware('throttle:10,1');
+   Route::post('/items', [RankingItemController::class, 'store'])->middleware('throttle:5,1');
+   Route::post('/items/{id}/alias', [RankingItemController::class, 'addAlias'])->middleware('throttle:15,1');
+   Route::delete('/items/{id}/alias/{alias}', [RankingItemController::class, 'deleteAlias'])->middleware('throttle:30,1');
 
    Route::middleware('throttle:1,360')->group(function () {
       Route::post('/game/reward', [GameController::class, 'reward']);
@@ -84,12 +72,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 //sanctum認証不要なルート
-Route::middleware('throttle:10,1')->group(function () {
-
-   Route::post('/auth/guest', [AuthController::class, 'guestLogin']);
-   Route::get('/app/status', [AppController::class, 'status']);
-   Route::get('/users/public/{publicId}', [UserController::class, 'findByPublicId']);
-});
+Route::post('/auth/guest', [AuthController::class, 'guestLogin'])->middleware('throttle:20,1');
+Route::get('/app/status', [AppController::class, 'status'])->middleware('throttle:10,1');
+Route::get('/users/public/{publicId}', [UserController::class, 'findByPublicId'])->middleware('throttle:20,1');
 Route::get('/personal-ranking/{userId}', [PersonalRankingController::class, 'show']);
 Route::get('/users/{userId}/voted-rankings', [VoteController::class, 'votedRankings']);
 Route::get('/rankings/official-latest', [RankingController::class, 'officialLatest']);
