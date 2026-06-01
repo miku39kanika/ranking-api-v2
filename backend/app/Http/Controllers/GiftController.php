@@ -53,14 +53,6 @@ class GiftController extends Controller
             ->with('item') // ←追加
             ->latest()
             ->get();
-
-        Log::info('GIFTS DEBUG', [
-            'user_id' => $userId,
-            'from' => $from,
-            'gifts_count' => $gifts->count(),
-            'gift_ids' => $gifts->pluck('id'),
-            'gift_users' => $gifts->pluck('user_id'),
-        ]);
         $receivedGiftIds = DB::table('user_gifts')
             ->where('user_id', $userId)
             ->pluck('gift_id')
@@ -68,6 +60,8 @@ class GiftController extends Controller
 
         return response()->json(
             $gifts->map(function ($gift) use ($receivedGiftIds) {
+                Log::info($gift->expires_at);
+                Log::info($gift->expires_at?->toJson());
                 return [
                     'id' => $gift->id,
                     'title' => $gift->title,

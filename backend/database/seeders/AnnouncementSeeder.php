@@ -17,7 +17,7 @@ class AnnouncementSeeder extends Seeder
 
         Announcement::create([
             'title' => '今後のアップデート予定/構想',
-            'body' => "今後はガチャ機能、ランキングフレームや称号の追加を予定しています。",
+            'body' => "・アイコンやフレームなど装飾品のガチャ機能\n・ランキングフレームと称号の実装\n・ランキングへの招待をランキングコードのみでなく、相互フォロワーから行えるように。",
             'important' => false,
         ]);
     }

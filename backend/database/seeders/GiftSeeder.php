@@ -52,7 +52,7 @@ class GiftSeeder extends Seeder
             'user_id' => null,
 
             'reward_type' => 'item',
-            'reward_code' => 25,
+            'reward_code' => 26,
             'reward_amount' => 1,
 
             'from_date' => null,

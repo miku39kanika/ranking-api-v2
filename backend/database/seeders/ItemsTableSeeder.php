@@ -274,6 +274,15 @@ class ItemsTableSeeder extends Seeder
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
+            [
+                'name' => 'わちゃわちゃアイコン(実写)',
+                'description' => 'アイコン：実写風の特別な限定アイコン',
+                'type' => 'icon',
+                'rarity' => 'rare',
+                'image_name' => 'sp_real01',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
         ]);
     }
 }

@@ -32,6 +32,7 @@ class RewardDailyCrowns extends Command
                 'rankings.id'
             )
             ->where('votes.vote_date', $date)
+            ->where('rankings.vote_permission', 'public_access')
             ->select(
                 'rankings.user_id',
                 DB::raw('COUNT(votes.id) as vote_count')
@@ -83,7 +84,7 @@ class RewardDailyCrowns extends Command
 
         // =====================
         // 投票回数 reward
-        // 1vote = 5 crown
+        // 1vote = 2 crown
         // =====================
 
         $voteRewards = DB::table('votes')

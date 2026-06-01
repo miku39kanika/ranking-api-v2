@@ -21,6 +21,7 @@ use App\Http\Controllers\BlockController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\SeasonCrownRankingController;
+use App\Http\Controllers\PurchaseController;
 
 Route::middleware('auth:sanctum')->group(function () {
    Route::post('/items/consume', [ItemController::class, 'consume'])->middleware('throttle:10,1');
@@ -46,7 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
    Route::post('/items', [RankingItemController::class, 'store'])->middleware('throttle:5,1');
    Route::post('/items/{id}/alias', [RankingItemController::class, 'addAlias'])->middleware('throttle:15,1');
    Route::delete('/items/{id}/alias/{alias}', [RankingItemController::class, 'deleteAlias'])->middleware('throttle:30,1');
-
+   Route::post('/purchases', [PurchaseController::class, 'store'])->middleware('throttle:5,1');
    Route::middleware('throttle:1,360')->group(function () {
       Route::post('/game/reward', [GameController::class, 'reward']);
    });

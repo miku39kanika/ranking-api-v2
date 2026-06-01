@@ -61,6 +61,10 @@ class ItemController extends Controller
             ->where('user_items.user_id', $userId)
             ->where('user_items.quantity', '>', 0)
             ->where('items.type', '=', 'item')
+            ->where(function ($q) {
+                $q->whereNull('user_items.expires_at')
+                    ->orWhere('user_items.expires_at', '>', now());
+            })
             ->select(
                 'user_items.id as user_item_id',
                 'items.id as item_id',
