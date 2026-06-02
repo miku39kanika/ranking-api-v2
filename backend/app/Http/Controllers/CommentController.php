@@ -34,9 +34,6 @@ class CommentController extends Controller
             })
             ->orderBy('created_at', 'desc')
             ->get();
-
-        Log::info('Fetched comments:', $comments->toArray());
-
         return response()->json($comments);
     }
 

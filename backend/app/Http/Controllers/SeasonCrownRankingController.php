@@ -76,10 +76,10 @@ class SeasonCrownRankingController extends Controller
                 ];
             }),
 
-            'items' => $items->map(function ($item) {
+            'items' => $items->values()->map(function ($item, $index) {
 
                 return [
-                    'id' => $item->rank,
+                    'id' => $index + 1,
 
                     'name' => $item->user_name,
 

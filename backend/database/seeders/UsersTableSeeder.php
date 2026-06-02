@@ -16,7 +16,7 @@ class UsersTableSeeder extends Seeder
         $users = [];
 
         // user_01 ~ user_10
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 20; $i++) {
             $users[] = [
                 'id' => sprintf('user_%02d', $i),
                 'public_id' => Str::random(10),

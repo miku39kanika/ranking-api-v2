@@ -100,7 +100,7 @@ class RewardDailyCrowns extends Command
 
             $userId = $row->user_identifier;
 
-            $amount = $row->vote_count * 2;
+            $amount = $row->vote_count * 5;
 
             if ($amount <= 0) {
                 continue;

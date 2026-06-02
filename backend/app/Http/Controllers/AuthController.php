@@ -161,3 +161,4 @@ class AuthController extends Controller
         return $id;
     }
 }
+
