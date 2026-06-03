@@ -15,25 +15,60 @@ class UsersTableSeeder extends Seeder
 
         $users = [];
 
-        // user_01 ~ user_10
-        for ($i = 1; $i <= 20; $i++) {
-            $users[] = [
-                'id' => sprintf('user_%02d', $i),
+        $users = [
+
+            [
+                'id' => 'user_01',
                 'public_id' => Str::random(10),
                 'invite_code' => Str::random(10),
-                'user_name' => "ユーザー{$i}",
+                'user_name' => '世界一のヒトシ',
                 'device_id' => null,
                 'email' => null,
                 'plan_type' => 0,
                 'icon_type' => 'asset',
-                'icon_name' => $iconNames[array_rand($iconNames)],
-                'about_self' => "自己紹介{$i}",
+                'icon_name' => 'ast02',
+                'about_self' => 'そりゃもう世界一です',
                 'is_deleted' => false,
                 'banned_at' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ];
-        }
+            ],
+
+            [
+                'id' => 'user_02',
+                'public_id' => Str::random(10),
+                'invite_code' => Str::random(10),
+                'user_name' => 'らぶぶLOVE部部員',
+                'device_id' => null,
+                'email' => null,
+                'plan_type' => 1,
+                'icon_type' => 'asset',
+                'icon_name' => 'ast03',
+                'about_self' => 'らぶぶ人気なくなって寂しい',
+                'is_deleted' => false,
+                'banned_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            [
+                'id' => 'user_03',
+                'public_id' => Str::random(10),
+                'invite_code' => Str::random(10),
+                'user_name' => '板チョコに腹筋ついてんのかい！',
+                'device_id' => null,
+                'email' => null,
+                'plan_type' => 0,
+                'icon_type' => 'asset',
+                'icon_name' => 'ast03',
+                'about_self' => '33番！',
+                'is_deleted' => false,
+                'banned_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+        ];
 
         // 削除ユーザー
         $users[] = [
@@ -73,11 +108,11 @@ class UsersTableSeeder extends Seeder
         $users[] = [
             'id' => "user_99",
             'public_id' => 0000000000,
-            'invite_code' => 0000000000,
+            'invite_code' => 6245624234,
             'user_name' => "公式太郎",
             'device_id' => null,
             'email' => null,
-            'plan_type' => 0,
+            'plan_type' => 3,
             'icon_type' => 'asset',
             'icon_name' => "icon99",
             'about_self' => "公式の人です",
@@ -86,6 +121,24 @@ class UsersTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
+        $users[] = [
+            'id' => "bot_user",
+            'public_id' => 9999999999,
+            'invite_code' => 6275623464,
+            'user_name' => "ボッスン",
+            'device_id' => null,
+            'email' => null,
+            'plan_type' => 0,
+            'icon_type' => 'asset',
+            'icon_name' => "icon01",
+            'about_self' => "どもです",
+            'is_deleted' => false,
+            'banned_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+
         DB::table('users')->insert($users);
     }
 }

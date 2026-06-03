@@ -221,7 +221,7 @@ class ItemsTableSeeder extends Seeder
                 'updated_at' => $now,
             ],
             [
-                'name' => 'わちゃわちゃアイコン(原画)',
+                'name' => 'わちゃわちゃアイコン(原画・サイン)',
                 'description' => 'アイコン：原画仕様の特別なアイコン',
                 'type' => 'icon',
                 'rarity' => 'common',
@@ -230,7 +230,7 @@ class ItemsTableSeeder extends Seeder
                 'updated_at' => $now,
             ],
             [
-                'name' => 'ぷりめアイコン(原画)',
+                'name' => 'ぷりめアイコン(原画・サイン)',
                 'description' => 'アイコン：原画仕様の特別なアイコン',
                 'type' => 'icon',
                 'rarity' => 'common',
@@ -239,7 +239,7 @@ class ItemsTableSeeder extends Seeder
                 'updated_at' => $now,
             ],
             [
-                'name' => 'きゃびーアイコン(原画)',
+                'name' => 'きゃびーアイコン(原画・サイン)',
                 'description' => 'アイコン：原画仕様の特別なアイコン',
                 'type' => 'icon',
                 'rarity' => 'common',

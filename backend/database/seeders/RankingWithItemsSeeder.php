@@ -51,176 +51,100 @@ class RankingWithItemsSeeder extends Seeder
         // -------------------------
         // ランキングテーマ + アイテム
         // -------------------------
-        $data = [
+        $createRanking = function (array $ranking, array $items) use ($now) {
 
-            "好きなラーメンの種類ランキング" => [
-                "醤油ラーメン",
-                "味噌ラーメン",
-                "塩ラーメン",
-                "豚骨ラーメン",
-                "家系ラーメン",
-                "二郎系ラーメン",
-                "担々麺",
-                "魚介系ラーメン",
-                "つけ麺",
-                "油そば"
-            ],
+            $rankingId = DB::table('rankings')->insertGetId(array_merge([
+                'ranking_type' => 0,
+                'reading' => null,
+                'tag' => null,
+                'image_name' => 'sample1',
+                'is_item_add_limited' => 0,
+                'daily_vote_limit' => 1,
+                'total_vote_limit' => 10,
+                'vote_permission' => 'public_access',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ], $ranking));
 
-            "人気アニメランキング" => [
-                "進撃の巨人",
-                "呪術廻戦",
-                "鬼滅の刃",
-                "ワンピース",
-                "ナルト",
-                "ハンターハンター",
-                "リゼロ",
-                "SAO",
-                "ヒロアカ",
-                "スパイファミリー"
-            ],
-
-            "行きたい旅行先ランキング" => [
-                "ハワイ",
-                "パリ",
-                "ニューヨーク",
-                "バリ島",
-                "北海道",
-                "京都",
-                "沖縄",
-                "ロンドン",
-                "ローマ",
-                "シンガポール"
-            ],
-
-            "よく使うSNSランキング" => [
-                "LINE",
-                "Instagram",
-                "X（Twitter）",
-                "TikTok",
-                "YouTube",
-                "Facebook",
-                "Discord",
-                "Snapchat",
-                "BeReal",
-                "Threads"
-            ],
-
-            "好きなゲームランキング" => [
-                "ゼルダの伝説",
-                "マリオ",
-                "ポケモン",
-                "スプラトゥーン",
-                "APEX",
-                "マインクラフト",
-                "原神",
-                "FF7",
-                "エルデンリング",
-                "ダークソウル"
-            ],
-
-            "好きなコンビニ商品ランキング" => [
-                "おにぎり",
-                "からあげ",
-                "サンドイッチ",
-                "弁当",
-                "スイーツ",
-                "カップラーメン",
-                "パン",
-                "ホットスナック",
-                "アイス",
-                "コーヒー"
-            ],
-
-            "好きな動物ランキング" => [
-                "犬",
-                "猫",
-                "ハムスター",
-                "うさぎ",
-                "鳥",
-                "フェレット",
-                "リス",
-                "カメ",
-                "熱帯魚",
-                "チンチラ"
-            ],
-
-            "朝食に食べたいものランキング" => [
-                "トースト",
-                "ご飯",
-                "卵かけご飯",
-                "ヨーグルト",
-                "シリアル",
-                "パンケーキ",
-                "サンドイッチ",
-                "味噌汁",
-                "フルーツ",
-                "納豆"
-            ],
-
-            "好きな映画ジャンルランキング" => [
-                "アクション",
-                "コメディ",
-                "ホラー",
-                "恋愛",
-                "SF",
-                "ファンタジー",
-                "ミステリー",
-                "アニメ",
-                "ドキュメンタリー",
-                "サスペンス"
-            ],
-
-            "学生時代の思い出ランキング" => [
-                "修学旅行",
-                "文化祭",
-                "体育祭",
-                "部活",
-                "放課後",
-                "テスト",
-                "友達との遊び",
-                "恋愛",
-                "卒業式",
-                "合唱コンクール"
-            ],
-        ];
-
-        // 👇 30件作るために3周
-        $loop = 3;
-
-        foreach (range(1, $loop) as $round) {
-
-            foreach ($data as $title => $items) {
-
-                // --- ranking作成 ---
-                $rankingId = DB::table('rankings')->insertGetId([
-                    'ranking_type' => 0,
-                    'title' => $title,
-                    'reading' => null,
-                    'tag' => "アニメ",
-                    'image_name' => "sample1",
-                    'is_item_add_limited' => rand(0, 1),
-                    'daily_vote_limit' => rand(1, 3),
-                    'total_vote_limit' => rand(5, 20),
-                    'vote_permission' => 'public_access',
-                    'user_id' => $userIds[array_rand($userIds)],
+            foreach ($items as $item) {
+                DB::table('ranking_items')->insert([
+                    'ranking_id' => $rankingId,
+                    'name' => $item['name'],
+                    'votes' => $item['votes'] ?? 0,
+                    'aliases' => json_encode($item['aliases'] ?? []),
                     'created_at' => $now,
                     'updated_at' => $now,
                 ]);
-
-                // --- items作成（10件） ---
-                foreach ($items as $name) {
-                    DB::table('ranking_items')->insert([
-                        'ranking_id' => $rankingId,
-                        'name' => $name,
-                        'votes' => rand(10, 500), // ある程度差をつける
-                        'aliases' => json_encode([]),
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
-                }
             }
-        }
+        };
+        $createRanking([
+            'title' => '好きなラーメンの種類ランキング',
+            'reading' => 'すきならーめんのしゅるいらんきんぐ',
+            'tag' => 'グルメ',
+            'image_name' => 'food_default',
+            'is_item_add_limited' => 1,
+            'daily_vote_limit' => 1,
+            'total_vote_limit' => 10,
+            'vote_permission' => 'public_access',
+            'user_id' => 'user_01',
+        ], [
+            ['name' => '醤油ラーメン', 'votes' => 42],
+            ['name' => '味噌ラーメン', 'votes' => 38],
+            ['name' => '塩ラーメン', 'votes' => 26],
+            ['name' => '豚骨ラーメン', 'votes' => 51],
+            ['name' => '家系ラーメン', 'votes' => 33],
+            ['name' => '二郎系ラーメン', 'votes' => 21],
+            ['name' => '担々麺', 'votes' => 19],
+            ['name' => '魚介系ラーメン', 'votes' => 16],
+            ['name' => 'つけ麺', 'votes' => 29],
+            ['name' => '油そば', 'votes' => 9],
+        ]);
 
+        $createRanking([
+            'title' => '人気アニメランキング',
+            'reading' => 'にんきあにめらんきんぐ',
+            'tag' => 'アニメ',
+            'image_name' => 'anime_default',
+            'is_item_add_limited' => 1,
+            'daily_vote_limit' => 1,
+            'total_vote_limit' => 10,
+            'vote_permission' => 'public_access',
+            'user_id' => 'user_02',
+        ], [
+            ['name' => '進撃の巨人', 'votes' => 19],
+            ['name' => '呪術廻戦', 'votes' => 36],
+            ['name' => '鬼滅の刃', 'votes' => 29],
+            ['name' => 'ワンピース', 'votes' => 32],
+            ['name' => 'ナルト', 'votes' => 27],
+            ['name' => 'ハンターハンター', 'votes' => 26],
+            ['name' => 'リゼロ', 'votes' => 18],
+            ['name' => 'SAO', 'votes' => 11],
+            ['name' => 'ヒロアカ', 'votes' => 28],
+            ['name' => 'スパイファミリー', 'votes' => 7],
+        ]);
+
+        $createRanking([
+            'title' => '行きたい旅行先ランキング',
+            'reading' => 'いきたいりょこうさきらんきんぐ',
+            'tag' => '旅行',
+            'image_name' => 'travel_default',
+            'is_item_add_limited' => 0,
+            'daily_vote_limit' => 1,
+            'total_vote_limit' => 5,
+            'vote_permission' => 'public_access',
+            'user_id' => 'user_03',
+        ], [
+            ['name' => '北海道', 'votes' => 45],
+            ['name' => '沖縄', 'votes' => 36],
+            ['name' => '京都', 'votes' => 23],
+            ['name' => '大阪', 'votes' => 16],
+            ['name' => '福岡', 'votes' => 9],
+            ['name' => 'ハワイ', 'votes' => 28],
+            ['name' => 'パリ', 'votes' => 13],
+            ['name' => '台湾', 'votes' => 10],
+            ['name' => '韓国', 'votes' => 16],
+            ['name' => 'シンガポール', 'votes' => 11],
+        ]);
 
 
         $rankingId = DB::table('rankings')->insertGetId([

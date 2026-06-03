@@ -15,12 +15,12 @@ class RankingTagTableSeeder extends Seeder
         DB::table('ranking_tag')->insert([
 
             [
-                'ranking_id' => 31,
+                'ranking_id' => 1,
                 'tag_id' => 16,
             ],
 
             [
-                'ranking_id' => 32,
+                'ranking_id' => 2,
                 'tag_id' => 16,
             ],
         ]);

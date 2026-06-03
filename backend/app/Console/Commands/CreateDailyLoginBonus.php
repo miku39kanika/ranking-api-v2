@@ -25,8 +25,8 @@ class CreateDailyLoginBonus extends Command
         if (!$exists) {
 
             Gift::create([
-                'title' => 'Login Bonus',
-                'body' => 'ログインボーナスです！',
+                'title' => 'ログインボーナス！',
+                'body' => 'ログインボーナスです。ランキング作成チケット(使用期限:当日)を1枚プレゼント！',
                 'case' => 1,
 
                 // reward

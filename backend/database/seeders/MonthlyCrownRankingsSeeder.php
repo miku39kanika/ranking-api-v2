@@ -14,9 +14,9 @@ class MonthlyCrownRankingsSeeder extends Seeder
         for ($i = 1; $i <= 20; $i++) {
 
             $rows[] = [
-                'year_month' => '2026-05',
+                'year_month' => '2026-06',
                 'user_id' => sprintf('user_%02d', $i),
-                'crown_amount' => rand(500, 5000),
+                'crown_amount' => rand(1, 500),
                 'rank' => $i,
                 'snapshot_date' => now()->toDateString(),
                 'created_at' => now(),

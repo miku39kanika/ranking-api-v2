@@ -35,3 +35,8 @@ Schedule::command('queue:work --stop-when-empty')
 // plan期限切れ
 Schedule::command('plan:expire')
     ->daily();
+
+// ベータ版 Bot投票
+Schedule::command('bot:vote-rankings')
+    ->everyMinute()
+    ->withoutOverlapping();
