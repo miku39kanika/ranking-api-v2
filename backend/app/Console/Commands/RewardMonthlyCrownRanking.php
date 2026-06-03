@@ -7,117 +7,119 @@ use Illuminate\Support\Facades\DB;
 
 class RewardMonthlyCrownRanking extends Command
 {
-    protected $signature =
-    'reward:monthly-crown-ranking';
+    protected $signature = 'reward:monthly-crown-ranking';
 
-    protected $description =
-    'Send gifts based on monthly crown ranking';
+    protected $description = 'Send gifts based on monthly crown ranking';
 
     public function handle()
     {
-        // =====================
-        // 前月
-        // =====================
+        $yearMonth = now()->subMonth()->format('Y-m');
 
-        $yearMonth = now()
-            ->subMonth()
-            ->format('Y-m');
-
-        // =====================
-        // 最新snapshot取得
-        // =====================
-
-        $latestSnapshot = DB::table(
-            'monthly_crown_rankings'
-        )
+        $latestSnapshot = DB::table('monthly_crown_rankings')
             ->where('year_month', $yearMonth)
             ->max('snapshot_date');
 
         if (!$latestSnapshot) {
-
             $this->info('snapshot not found');
-
             return;
         }
 
-        // =====================
-        // 最終ランキング取得
-        // =====================
-
-        $rankings = DB::table(
-            'monthly_crown_rankings'
-        )
+        $rankings = DB::table('monthly_crown_rankings')
             ->where('year_month', $yearMonth)
-            ->where(
-                'snapshot_date',
-                $latestSnapshot
-            )
+            ->where('snapshot_date', $latestSnapshot)
+            ->where('rank', '<=', 20)
             ->orderBy('rank')
             ->get();
 
-        foreach ($rankings as $row) {
+        DB::transaction(function () use ($rankings, $yearMonth) {
 
-            $rewardAmount = 0;
+            foreach ($rankings as $row) {
 
-            // =====================
-            // 報酬決定
-            // =====================
+                $rewards = $this->rewardsForRank($row->rank);
 
-            if ($row->rank === 1) {
-
-                $rewardAmount = 3000;
-            } elseif ($row->rank <= 3) {
-
-                $rewardAmount = 2000;
-            } elseif ($row->rank <= 10) {
-
-                $rewardAmount = 1000;
-            } elseif ($row->rank <= 50) {
-
-                $rewardAmount = 300;
-            } else {
-
-                continue;
+                foreach ($rewards as $reward) {
+                    $this->sendGiftIfNotExists(
+                        userId: $row->user_id,
+                        yearMonth: $yearMonth,
+                        rank: $row->rank,
+                        rewardType: $reward['reward_type'],
+                        rewardCode: $reward['reward_code'],
+                        rewardAmount: $reward['reward_amount']
+                    );
+                }
             }
+        });
 
-            // =====================
-            // gift送信
-            // =====================
+        $this->info('monthly ranking rewards sent');
+    }
 
-            DB::table('gifts')
-                ->insert([
-                    'title' =>
-                    '月間クラウンランキング報酬',
-
-                    'body' =>
-                    "{$yearMonth} 月間クラウンランキング {$row->rank}位 の報酬です。",
-
-                    'case' => 3,
-
-                    'user_id' => $row->user_id,
-
-                    'reward_type' => 'currency',
-
-                    // crown
-                    'reward_code' => 'crown',
-
-                    'reward_amount' => $rewardAmount,
-
-                    'expires_at' =>
-                    now()->addMonths(3),
-
-                    'from_date' => now(),
-
-                    'send_at' => now(),
-
-                    'created_at' => now(),
-
-                    'updated_at' => now(),
-                ]);
+    private function rewardsForRank(int $rank): array
+    {
+        if ($rank === 1) {
+            return [
+                ['reward_type' => 'item', 'reward_code' => '31', 'reward_amount' => 1],
+                ['reward_type' => 'item', 'reward_code' => '32', 'reward_amount' => 1],
+                ['reward_type' => 'item', 'reward_code' => '33', 'reward_amount' => 1],
+                ['reward_type' => 'currency', 'reward_code' => 'orb', 'reward_amount' => 1000],
+            ];
         }
 
-        $this->info(
-            'monthly ranking rewards sent'
-        );
+        if ($rank <= 10) {
+            return [
+                ['reward_type' => 'item', 'reward_code' => '32', 'reward_amount' => 1],
+                ['reward_type' => 'item', 'reward_code' => '33', 'reward_amount' => 1],
+                ['reward_type' => 'currency', 'reward_code' => 'orb', 'reward_amount' => 500],
+            ];
+        }
+
+        if ($rank <= 20) {
+            return [
+                ['reward_type' => 'item', 'reward_code' => '33', 'reward_amount' => 1],
+                ['reward_type' => 'currency', 'reward_code' => 'orb', 'reward_amount' => 300],
+            ];
+        }
+
+        return [];
+    }
+
+    private function sendGiftIfNotExists(
+        string $userId,
+        string $yearMonth,
+        int $rank,
+        string $rewardType,
+        string $rewardCode,
+        int $rewardAmount
+    ): void {
+        $title = '月間クラウンランキング報酬';
+
+        $body = "{$yearMonth} 月間クラウンランキング {$rank}位 の報酬です。";
+
+        $exists = DB::table('gifts')
+            ->where('title', $title)
+            ->where('body', $body)
+            ->where('case', 3)
+            ->where('user_id', $userId)
+            ->where('reward_type', $rewardType)
+            ->where('reward_code', $rewardCode)
+            ->exists();
+
+        if ($exists) {
+            return;
+        }
+
+        DB::table('gifts')->insert([
+            'title' => $title,
+            'body' => $body,
+            'case' => 3,
+            'user_id' => $userId,
+            'reward_type' => $rewardType,
+            'reward_code' => $rewardCode,
+            'reward_amount' => $rewardAmount,
+            'expires_at' => null,
+            'from_date' => now(),
+            'send_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

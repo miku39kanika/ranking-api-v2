@@ -283,6 +283,33 @@ class ItemsTableSeeder extends Seeder
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
+            [
+                'name' => '王者わちゃわちゃ(2026-06)',
+                'description' => 'アイコン：クラウンランキング報酬',
+                'type' => 'icon',
+                'rarity' => 'rare',
+                'image_name' => 'cr2606_01',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'name' => '覇者ぷりめ(2026-06)',
+                'description' => 'アイコン：クラウンランキング報酬',
+                'type' => 'icon',
+                'rarity' => 'rare',
+                'image_name' => 'cr2606_02',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'name' => 'ブイブイ言わせているきゃびー(2026-06)',
+                'description' => 'アイコン：クラウンランキング報酬',
+                'type' => 'icon',
+                'rarity' => 'rare',
+                'image_name' => 'cr2606_03',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
         ]);
     }
 }
