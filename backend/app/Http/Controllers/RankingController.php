@@ -331,6 +331,7 @@ class RankingController extends Controller
             }),
             'creator' => $ranking->user ? [
                 'id' => $ranking->user->id,
+                'public_id' => $ranking->user->public_id,
                 'user_name' => $ranking->user->user_name,
                 'icon_type' => $ranking->user->icon_type,
                 'icon_name' => $ranking->user->icon_name,
