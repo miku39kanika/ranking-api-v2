@@ -61,10 +61,9 @@ class UpdateSeasonCrownRanking extends Command
                         'year_month' => $yearMonth,
 
                         'user_id' => $user->user_id,
-
-                        'snapshot_date' => today(),
                     ],
                     [
+                        'snapshot_date' => today(),
                         'crown_amount' =>
                         (int) $user->crown_amount,
 

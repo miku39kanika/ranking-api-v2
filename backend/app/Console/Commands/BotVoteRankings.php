@@ -50,12 +50,15 @@ class BotVoteRankings extends Command
             $selected = $weightedChoices[array_rand($weightedChoices)];
 
             DB::table('votes')->insert([
-                'user_id' => $botUserId,
+                'user_identifier' => $botUserId,
                 'ranking_id' => $ranking->id,
                 'ranking_item_id' => $selected->id,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+            DB::table('ranking_items')
+                ->where('id', $selected->id)
+                ->increment('votes');
         }
 
         $this->info('Bot voting completed.');
