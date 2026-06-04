@@ -48,7 +48,7 @@ class UpdateSeasonCrownRanking extends Command
                 $startOfMonth
             )
             ->groupBy('user_id')
-            ->orderByDesc('crown_amount')
+            ->orderByDesc(DB::raw('SUM(amount)'))
             ->get();
 
         $rank = 1;

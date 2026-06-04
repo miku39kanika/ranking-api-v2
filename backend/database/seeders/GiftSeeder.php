@@ -40,7 +40,7 @@ class GiftSeeder extends Seeder
             'reward_amount' => 1,
 
             'from_date' => null,
-            'expires_at' => Carbon::now()->addDays(30),
+            'expires_at' => null,
         ]);
         // =====================
         // case 1(2つ目)：全員・常時（item_アイコン）
@@ -56,7 +56,7 @@ class GiftSeeder extends Seeder
             'reward_amount' => 1,
 
             'from_date' => null,
-            'expires_at' => Carbon::now()->addDays(30),
+            'expires_at' => null,
         ]);
         // =====================
         // case 1(3つ目)：全員・常時（item_アイテム）

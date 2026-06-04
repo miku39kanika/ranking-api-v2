@@ -27,9 +27,12 @@ class SeasonCrownRankingController extends Controller
         // 最新 month 取得
         // =====================
 
-        $latestYearMonth =
-            DB::table('monthly_crown_rankings')
+        $latestYearMonth = DB::table('monthly_crown_rankings')
             ->max('year_month');
+
+        $latestSnapshot = DB::table('monthly_crown_rankings')
+            ->where('year_month', $latestYearMonth)
+            ->max('snapshot_date');
 
         // =====================
         // ランキング取得
@@ -43,6 +46,10 @@ class SeasonCrownRankingController extends Controller
             ->where(
                 'monthly_crown_rankings.year_month',
                 $latestYearMonth
+            )
+            ->where(
+                'monthly_crown_rankings.snapshot_date',
+                $latestSnapshot
             )
             ->orderBy('monthly_crown_rankings.rank')
             ->limit(100)

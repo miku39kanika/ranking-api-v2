@@ -25,10 +25,10 @@ use App\Http\Controllers\PurchaseController;
 
 Route::middleware('auth:sanctum')->group(function () {
    Route::post('/items/consume', [ItemController::class, 'consume'])->middleware('throttle:10,1');
-   Route::put('/users/update', [UserController::class, 'update'])->middleware('throttle:10,1');
-   Route::put('/personal-ranking/update', [PersonalRankingController::class, 'update'])->middleware('throttle:3,1');
-   Route::post('/rankings', [RankingController::class, 'store'])->middleware('throttle:3,1');
-   Route::post('/blocks', [BlockController::class, 'store'])->middleware('throttle:5,1');
+   Route::put('/users/update', [UserController::class, 'update'])->middleware('throttle:30,1');
+   Route::put('/personal-ranking/update', [PersonalRankingController::class, 'update'])->middleware('throttle:30,1');
+   Route::post('/rankings', [RankingController::class, 'store'])->middleware('throttle:10,1');
+   Route::post('/blocks', [BlockController::class, 'store'])->middleware('throttle:30,1');
    Route::delete('/blocks/unblock', [BlockController::class, 'destroy'])->middleware('throttle:5,1');
    Route::post('/likes/toggle', [LikeController::class, 'toggle'])->middleware('throttle:30,1');
    Route::post('/comments', [CommentController::class, 'store'])->middleware('throttle:20,1');
@@ -39,8 +39,8 @@ Route::middleware('auth:sanctum')->group(function () {
    Route::post('/user/email/verify', [UserController::class, 'verifyEmail'])->middleware('throttle:3,1');
    Route::post('/user/transfer', [UserController::class, 'transferAccount'])->middleware('throttle:5,1');
    Route::post('/user/transfer/send-code', [UserController::class, 'sendTransferCode'])->middleware('throttle:5,1');;
-   Route::post('/reports', [ReportController::class, 'store'])->middleware('throttle:3,1');
-   Route::post('/feedbacks', [FeedbackController::class, 'store'])->middleware('throttle:3,1');
+   Route::post('/reports', [ReportController::class, 'store'])->middleware('throttle:20,1');
+   Route::post('/feedbacks', [FeedbackController::class, 'store'])->middleware('throttle:20,1');
    Route::post('/users/delete', [UserController::class, 'delete'])->middleware('throttle:2,1');
    Route::post('/vote', [VoteController::class, 'vote'])->middleware('throttle:60,1');
    Route::post('/gifts/receive', [GiftController::class, 'receive'])->middleware('throttle:10,1');

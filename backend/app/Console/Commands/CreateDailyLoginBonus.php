@@ -18,7 +18,7 @@ class CreateDailyLoginBonus extends Command
         // 今日のログインボーナス存在確認
         // =====================
 
-        $exists = Gift::where('title', 'Login Bonus')
+        $exists = Gift::where('title', 'ログインボーナス！')
             ->whereDate('created_at', today())
             ->exists();
 

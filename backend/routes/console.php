@@ -25,7 +25,7 @@ Schedule::command(
 // 月初ランキング報酬
 Schedule::command(
     'reward:monthly-crown-ranking'
-)->monthlyOn(1, '00:10');
+)->monthlyOn(1, '05:10');
 
 // queue
 Schedule::command('queue:work --stop-when-empty')
@@ -33,7 +33,7 @@ Schedule::command('queue:work --stop-when-empty')
     ->withoutOverlapping();
 
 // plan期限切れ
-Schedule::command('plan:expire')
+Schedule::command('app:expire-plans')
     ->daily();
 
 // ベータ版 Bot投票

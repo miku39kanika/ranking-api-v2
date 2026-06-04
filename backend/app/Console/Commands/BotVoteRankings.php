@@ -15,8 +15,10 @@ class BotVoteRankings extends Command
         $botUserId = "bot_user"; // Bot用ユーザーID
 
         $rankings = DB::table('rankings')
+            ->where('ranking_type', 0)
+            ->where('vote_permission', 'public_access')
             ->inRandomOrder()
-            ->limit(rand(1, 5))
+            ->limit(1)
             ->get();
 
         foreach ($rankings as $ranking) {

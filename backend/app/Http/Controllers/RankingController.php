@@ -567,6 +567,7 @@ class RankingController extends Controller
             $query->orderByDesc('votes')->limit(5);
         }])
             ->where('ranking_type', 0)
+            ->where('vote_permission', 'public_access')
             ->inRandomOrder()
             ->limit(10) // ここは好みで3〜10くらい
             ->get();

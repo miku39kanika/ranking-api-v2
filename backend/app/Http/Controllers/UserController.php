@@ -160,13 +160,13 @@ class UserController extends Controller
                 ]
             );
             Gift::create([
-                'title' => '招待報酬(オーブ×500)',
+                'title' => '招待報酬(オーブ×300)',
                 'body' => '招待限定報酬です！招待コードを入力してくれてありがとうございます！',
                 'case' => 3,
                 'user_id' => $user->id, // ←招待された人
                 'reward_type' => 'currency',
                 'reward_code' => 1,
-                'reward_amount' => 500,
+                'reward_amount' => 300,
                 'from_date' => null,
                 'expires_at' => now()->addDays(14),
             ]);
@@ -182,14 +182,14 @@ class UserController extends Controller
                 'expires_at' => now()->addDays(14),
             ]);
             Gift::create([
-                'title' => '招待報酬(オーブ×300)',
+                'title' => '招待報酬(オーブ×200)',
                 'body' => 'あなたが招待した人がアプリへやってきました！招待ありがとうございます！',
                 'case' => 3,
                 'user_id' => $inviter->id, // ←招待した人
 
                 'reward_type' => 'currency',
                 'reward_code' => 1,
-                'reward_amount' => 300,
+                'reward_amount' => 200,
 
                 'from_date' => null,
                 'expires_at' => now()->addDays(14),

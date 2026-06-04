@@ -19,7 +19,7 @@ class RewardDailyCrowns extends Command
         // =====================
 
         $date = now()->subDay()->toDateString();
-
+        $rewardedAt = now()->subDay()->endOfDay();
         // =====================
         // ランキング獲得票 reward
         // =====================
@@ -77,30 +77,37 @@ class RewardDailyCrowns extends Command
                     'amount' => $amount,
                     'reason' => 'DAILY_VOTE_REWARD',
                     'note' => "daily votes: {$amount}",
-                    'created_at' => now(),
+                    'created_at' => $rewardedAt,
                     'updated_at' => now(),
                 ]);
         }
 
         // =====================
         // 投票回数 reward
-        // 1vote = 2 crown
+        // 1vote = 3 crown
         // =====================
 
         $voteRewards = DB::table('votes')
-            ->where('vote_date', $date)
-            ->select(
-                'user_identifier',
-                DB::raw('COUNT(id) as vote_count')
+            ->join(
+                'rankings',
+                'votes.ranking_id',
+                '=',
+                'rankings.id'
             )
-            ->groupBy('user_identifier')
+            ->where('votes.vote_date', $date)
+            ->where('rankings.vote_permission', 'public_access')
+            ->select(
+                'votes.user_identifier',
+                DB::raw('COUNT(votes.id) as vote_count')
+            )
+            ->groupBy('votes.user_identifier')
             ->get();
 
         foreach ($voteRewards as $row) {
 
             $userId = $row->user_identifier;
 
-            $amount = $row->vote_count * 5;
+            $amount = $row->vote_count * 3;
 
             if ($amount <= 0) {
                 continue;
@@ -131,7 +138,7 @@ class RewardDailyCrowns extends Command
                     'amount' => $amount,
                     'reason' => 'DAILY_CAST_REWARD',
                     'note' => "daily cast votes: {$amount}",
-                    'created_at' => now(),
+                    'created_at' => $rewardedAt,
                     'updated_at' => now(),
                 ]);
         }

@@ -18,10 +18,13 @@ class GenerateGameQuestions extends Command
         DB::table('game_questions')->truncate();
 
         $count = 0;
-
-        while ($count < 100) {
-
+        $attempt = 0;
+        $maxAttempt = 200;
+        while ($count < 100 && $attempt < $maxAttempt) {
+            $attempt++;
             $ranking = Ranking::with('items')
+                ->where('ranking_type', 0)
+                ->where('vote_permission', 'public_access')
                 ->inRandomOrder()
                 ->first();
 
