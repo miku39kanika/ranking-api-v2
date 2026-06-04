@@ -33,6 +33,10 @@ class RewardDailyCrowns extends Command
             )
             ->where('votes.vote_date', $date)
             ->where('rankings.vote_permission', 'public_access')
+            ->whereNotIn('rankings.user_id', [
+                'user_99',
+                'bot_user'
+            ])
             ->select(
                 'rankings.user_id',
                 DB::raw('COUNT(votes.id) as vote_count')
@@ -96,6 +100,10 @@ class RewardDailyCrowns extends Command
             )
             ->where('votes.vote_date', $date)
             ->where('rankings.vote_permission', 'public_access')
+            ->whereNotIn('votes.user_identifier', [
+                'user_99',
+                'bot_user'
+            ])
             ->select(
                 'votes.user_identifier',
                 DB::raw('COUNT(votes.id) as vote_count')
