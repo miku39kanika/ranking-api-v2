@@ -216,7 +216,7 @@ class UserController extends Controller
             if (!$alreadyHasIconGift) {
                 Gift::create([
                     'title' => '招待報酬(限定アイコン)',
-                    'body' => 'あなたが招待した人がアプリへやってきました！招待ありがとうございます！ベータ版のみの限定アイコンをプレゼント！',
+                    'body' => 'あなたが招待した人がアプリへやってきました！招待ありがとうございます！リリース記念限定の限定アイコンをプレゼント！',
                     'case' => 3,
                     'user_id' => $inviter->id,
 
