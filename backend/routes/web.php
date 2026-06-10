@@ -7,3 +7,5 @@ Route::view('/', 'home');
 Route::view('/terms', 'terms');
 
 Route::view('/privacy', 'privacy');
+
+Route::view('/support', 'support');
