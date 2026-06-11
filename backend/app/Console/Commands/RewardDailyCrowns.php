@@ -98,8 +98,16 @@ class RewardDailyCrowns extends Command
                 '=',
                 'rankings.id'
             )
+            ->join(
+                'users',
+                'votes.user_identifier',
+                '=',
+                'users.id'
+            )
             ->where('votes.vote_date', $date)
             ->where('rankings.vote_permission', 'public_access')
+            ->whereNull('users.banned_at')
+            ->where('users.is_deleted', false)
             ->whereNotIn('votes.user_identifier', [
                 'user_99',
                 'bot_user'

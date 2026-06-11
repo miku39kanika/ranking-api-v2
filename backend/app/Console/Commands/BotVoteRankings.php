@@ -53,6 +53,7 @@ class BotVoteRankings extends Command
                 'user_identifier' => $botUserId,
                 'ranking_id' => $ranking->id,
                 'ranking_item_id' => $selected->id,
+                'vote_date' => now()->toDateString(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

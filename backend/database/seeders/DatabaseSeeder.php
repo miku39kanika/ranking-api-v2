@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UsersTableSeeder::class,
             RankingWithItemsSeeder::class,
-            VotesTableSeeder::class,
+            // VotesTableSeeder::class,
             // StaminasTableSeeder::class,
             CommentsTableSeeder::class,
             ItemsTableSeeder::class,
