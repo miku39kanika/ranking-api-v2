@@ -19,7 +19,7 @@ class PurchaseController extends Controller
         $user = $request->user();
 
         return DB::transaction(function () use ($request, $user) {
-
+            $rewards = [];
             $exists = DB::table('purchases')
                 ->where('transaction_id', $request->transaction_id)
                 ->exists();
@@ -31,6 +31,16 @@ class PurchaseController extends Controller
             }
 
             $productId = $request->product_id;
+
+            if (
+                $productId === 'premium_monthly'
+                && !$request->original_transaction_id
+            ) {
+                return response()->json([
+                    'message' =>
+                    'original_transaction_id is required for subscription',
+                ], 422);
+            }
 
             $type = $productId === 'premium_monthly'
                 ? 'subscription'
@@ -72,19 +82,23 @@ class PurchaseController extends Controller
                         'amount' => 1200,
                     ];
                     break;
-
                 case 'premium_monthly':
                     $this->activatePremium($user->id, $expiresAt);
 
-                    // 毎月オーブ500個
-                    $this->giveCurrency($user->id, 1, 500, 'premium_monthly_bonus');
+                    $rewardMonth = now()->format('Y-m');
 
-                    // ランキング作成チケット item02 × 5
-                    $this->giveItemByImageName($user->id, 'item02', 5);
+                    app(\App\Services\SubscriptionRewardService::class)
+                        ->grantMonthlyReward(
+                            $user->id,
+                            $request->original_transaction_id,
+                            $productId,
+                            $rewardMonth
+                        );
 
-                    // 限定アイコン
+                    // 限定アイコンは初回だけ
                     $this->giveItemByImageName($user->id, 'sp_real01', 1);
                     $this->giveItemByImageName($user->id, 'sp02', 1);
+
                     $rewards[] = [
                         'type' => 'currency',
                         'name' => 'オーブ',
@@ -92,7 +106,6 @@ class PurchaseController extends Controller
                         'amount' => 500,
                     ];
 
-                    $this->giveItemByImageName($user->id, 'item02', 5);
                     $rewards[] = [
                         'type' => 'item',
                         'name' => 'ランキング作成チケット',
@@ -100,15 +113,12 @@ class PurchaseController extends Controller
                         'amount' => 5,
                     ];
 
-                    $this->giveItemByImageName($user->id, 'sp_real01', 1);
                     $rewards[] = [
                         'type' => 'icon',
                         'name' => 'わちゃわちゃアイコン(実写)',
                         'image_name' => 'sp_real01',
                         'amount' => 1,
                     ];
-
-                    $this->giveItemByImageName($user->id, 'sp02', 1);
                     $rewards[] = [
                         'type' => 'icon',
                         'name' => 'ぷりめアイコン(原画)',
@@ -116,7 +126,6 @@ class PurchaseController extends Controller
                         'amount' => 1,
                     ];
                     break;
-
                 default:
                     return response()->json([
                         'message' => 'unknown product',

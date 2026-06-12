@@ -40,3 +40,6 @@ Schedule::command('app:expire-plans')
 Schedule::command('bot:vote-rankings')
     ->everyMinute()
     ->withoutOverlapping();
+
+Schedule::command('subscriptions:grant-monthly-rewards')
+    ->dailyAt('03:00');

@@ -22,6 +22,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\SeasonCrownRankingController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\AppleNotificationController;
 
 Route::middleware('auth:sanctum')->group(function () {
    Route::post('/items/consume', [ItemController::class, 'consume'])->middleware('throttle:10,1');
@@ -91,3 +92,4 @@ Route::get('/tags', [TagController::class, 'index']);
 Route::get('/announcements', [AnnouncementController::class, 'index']);
 Route::get('/announcements/{id}', [AnnouncementController::class, 'show']);
 Route::get('/items/{id}', [RankingItemController::class, 'show']);
+Route::post('/apple/app-store-notifications', [AppleNotificationController::class, 'handle']);
