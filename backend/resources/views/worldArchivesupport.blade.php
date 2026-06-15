@@ -97,7 +97,7 @@
             <h2>関連リンク</h2>
 
             <p>
-                <a href="https://worldarchiveapp.com/privacy">
+                <a href="https://nandemorankingapp.com/worldArchive/privacy">
                     プライバシーポリシー
                 </a>
             </p>
