@@ -105,11 +105,11 @@
             </p>
 
             <div class="links">
-                <a class="link-button" href="/terms">
+                <a class="link-button" href="/worldArchive/terms">
                     利用規約
                 </a>
 
-                <a class="link-button secondary" href="/privacy">
+                <a class="link-button secondary" href="/worldArchive/privacy">
                     プライバシーポリシー
                 </a>
             </div>
