@@ -21,7 +21,7 @@ class GrantMonthlyRewards extends Command
         foreach ($users as $user) {
             $purchase = DB::table('purchases')
                 ->where('user_id', $user->id)
-                ->where('product_id', 'premium_monthly')
+                ->where('product_id', 'premium_monthly_v2')
                 ->whereNotNull('original_transaction_id')
                 ->latest()
                 ->first();
@@ -34,7 +34,7 @@ class GrantMonthlyRewards extends Command
                 ->grantMonthlyReward(
                     $user->id,
                     $purchase->original_transaction_id,
-                    'premium_monthly',
+                    'premium_monthly_v2',
                     $rewardMonth
                 );
         }

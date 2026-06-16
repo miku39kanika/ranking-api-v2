@@ -38,7 +38,7 @@ class AppleNotificationController extends Controller
         $originalTransactionId = $transaction['originalTransactionId'] ?? null;
         $productId = $transaction['productId'] ?? null;
 
-        if (!$originalTransactionId || $productId !== 'premium_monthly') {
+        if (!$originalTransactionId || $productId !== 'premium_monthly_v2') {
             return response()->json(['message' => 'not target product']);
         }
 

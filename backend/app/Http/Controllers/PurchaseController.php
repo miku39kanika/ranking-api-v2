@@ -33,7 +33,7 @@ class PurchaseController extends Controller
             $productId = $request->product_id;
 
             if (
-                $productId === 'premium_monthly'
+                $productId === 'premium_monthly_v2'
                 && !$request->original_transaction_id
             ) {
                 return response()->json([
@@ -42,11 +42,11 @@ class PurchaseController extends Controller
                 ], 422);
             }
 
-            $type = $productId === 'premium_monthly'
+            $type = $productId === 'premium_monthly_v2'
                 ? 'subscription'
                 : 'consumable';
 
-            $expiresAt = $productId === 'premium_monthly'
+            $expiresAt = $productId === 'premium_monthly_v2'
                 ? now()->addMonth()
                 : null;
 
@@ -82,7 +82,7 @@ class PurchaseController extends Controller
                         'amount' => 1200,
                     ];
                     break;
-                case 'premium_monthly':
+                case 'premium_monthly_v2':
                     $this->activatePremium($user->id, $expiresAt);
 
                     $rewardMonth = now()->format('Y-m');

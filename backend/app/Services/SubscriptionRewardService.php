@@ -28,7 +28,7 @@ class SubscriptionRewardService
             }
 
             // オーブ500
-            $this->giveCurrency($userId, 1, 500, 'premium_monthly_reward');
+            $this->giveCurrency($userId, 1, 500, 'premium_monthly_v2_reward');
 
             // ランキング作成チケット5枚
             $this->giveItemByImageName($userId, 'item02', 5);
