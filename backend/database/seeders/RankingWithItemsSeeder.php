@@ -28,8 +28,8 @@ class RankingWithItemsSeeder extends Seeder
         $rankingId = DB::table('rankings')->insertGetId([
             'id' => 2,
             'ranking_type' => 1,
-            'title' => "公式：サンプルアンケート",
-            'reading' => "こうしき：さんぷるあんけーと",
+            'title' => "公式：要望アンケート",
+            'reading' => "こうしき：ようぼうあんけーと",
             'tag' => "公式",
             'image_name' => "official_default",
             'is_item_add_limited' => 0,
@@ -144,37 +144,6 @@ class RankingWithItemsSeeder extends Seeder
             ['name' => '台湾', 'votes' => 10],
             ['name' => '韓国', 'votes' => 16],
             ['name' => 'シンガポール', 'votes' => 11],
-        ]);
-
-
-        $rankingId = DB::table('rankings')->insertGetId([
-            'ranking_type' => 0,
-            'title' => "インバイトオンリービュー",
-            'reading' => "いんばいとおんりーびゅー",
-            'tag' => "アニメ",
-            'image_name' => "anime_default",
-            'is_item_add_limited' => 1,
-            'daily_vote_limit' => 0,
-            'total_vote_limit' => 0,
-            'vote_permission' => 'invite_only_view',
-            'user_id' => "user_99",
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
-        $rankingId = DB::table('rankings')->insertGetId([
-            'ranking_type' => 0,
-            'title' => "インバイトオンリーヒドゥン",
-            'reading' => "いんばいとおんりーひどぅん",
-            'tag' => "アニメ",
-            'image_name' => "anime_default",
-            'is_item_add_limited' => 1,
-            'daily_vote_limit' => 0,
-            'total_vote_limit' => 0,
-            'vote_permission' => 'invite_only_hidden',
-            'user_id' => "user_99",
-            'created_at' => $now,
-            'updated_at' => $now,
-            'invite_code' => "INVITE99",
         ]);
         //'public_access','invite_only_view', 'invite_only_hidden'
     }

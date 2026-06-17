@@ -11,7 +11,7 @@ class MonthlyCrownRankingsSeeder extends Seeder
     {
         $rows = [];
 
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i <= 3; $i++) {
 
             $rows[] = [
                 'year_month' => '2026-06',
