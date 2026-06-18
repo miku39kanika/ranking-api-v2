@@ -45,7 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
    Route::post('/users/delete', [UserController::class, 'delete'])->middleware('throttle:2,1');
    Route::post('/vote', [VoteController::class, 'vote'])->middleware('throttle:60,1');
    Route::post('/gifts/receive', [GiftController::class, 'receive'])->middleware('throttle:10,1');
-   Route::post('/items', [RankingItemController::class, 'store'])->middleware('throttle:5,1');
+   Route::post('/items', [RankingItemController::class, 'store'])->middleware('throttle:30,1');
    Route::post('/items/{id}/alias', [RankingItemController::class, 'addAlias'])->middleware('throttle:15,1');
    Route::delete('/items/{id}/alias/{alias}', [RankingItemController::class, 'deleteAlias'])->middleware('throttle:30,1');
    Route::post('/purchases', [PurchaseController::class, 'store'])->middleware('throttle:5,1');
