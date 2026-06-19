@@ -55,18 +55,13 @@ class RewardDailyCrowns extends Command
             }
 
             // なければ作成
-            DB::table('user_currencies')
-                ->updateOrInsert(
-                    [
-                        'user_id' => $userId,
-                        'currency_id' => 2,
-                    ],
-                    [
-                        'amount' => 0,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]
-                );
+            DB::table('user_currencies')->insertOrIgnore([
+                'user_id' => $userId,
+                'currency_id' => 2,
+                'amount' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
             // 加算
             DB::table('user_currencies')
@@ -129,18 +124,13 @@ class RewardDailyCrowns extends Command
                 continue;
             }
 
-            DB::table('user_currencies')
-                ->updateOrInsert(
-                    [
-                        'user_id' => $userId,
-                        'currency_id' => 2,
-                    ],
-                    [
-                        'amount' => 0,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]
-                );
+            DB::table('user_currencies')->insertOrIgnore([
+                'user_id' => $userId,
+                'currency_id' => 2,
+                'amount' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
             DB::table('user_currencies')
                 ->where('user_id', $userId)
