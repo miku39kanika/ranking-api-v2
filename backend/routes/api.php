@@ -52,7 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
    Route::middleware('throttle:1,360')->group(function () {
       Route::post('/game/reward', [GameController::class, 'reward']);
    });
-   Route::get('/random-rankings', [RankingController::class, 'random']);
+
    Route::get('/blocks/status', [BlockController::class, 'status']);
    Route::get('/blocks', [BlockController::class, 'index']);
    Route::get('/comments/{ranking_id}', [CommentController::class, 'index']);
@@ -82,6 +82,7 @@ Route::get('/users/{userId}/voted-rankings', [VoteController::class, 'votedRanki
 Route::get('/rankings/official-latest', [RankingController::class, 'officialLatest']);
 Route::get('/ranking/{id}', [RankingController::class, 'show']);
 Route::get('/users/{device_id}', [UserController::class, 'show']);
+Route::get('/random-rankings', [RankingController::class, 'random']);
 Route::get('/follow/counts/{userId}', [FollowController::class, 'counts']);
 Route::get('/follow/followings/{userId}', [FollowController::class, 'followings']);
 Route::get('/follow/followers/{userId}', [FollowController::class, 'followers']);

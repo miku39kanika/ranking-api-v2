@@ -564,11 +564,9 @@ class RankingController extends Controller
 
     public function random(Request $request)
     {
-        $userId = $request->user()->id;
+        $userId = $request->user()?->id;
 
-        $rankings = Ranking::with(['items' => function ($query) {
-            $query->orderByDesc('votes')->limit(5);
-        }])
+        $rankings = Ranking::with('items')
             ->where('ranking_type', 0)
             ->where('vote_permission', 'public_access')
             ->inRandomOrder()
@@ -578,25 +576,32 @@ class RankingController extends Controller
         return response()->json(
             $rankings->map(function ($ranking) use ($userId) {
 
-                $myTotalVotes = Vote::where('ranking_id', $ranking->id)
+                $myTotalVotes = $userId
+                    ? Vote::where('ranking_id', $ranking->id)
                     ->where('user_identifier', $userId)
-                    ->count();
+                    ->count()
+                    : 0;
 
                 return [
                     'id' => $ranking->id,
                     'title' => $ranking->title,
-                    'has_voted' => $myTotalVotes > 0,
-                    'items' => $ranking->items->map(function ($item) use ($userId) {
-                        return [
-                            'id' => $item->id,
-                            'name' => $item->name,
-                            'votes' => $item->votes,
-                            'aliases' => $item->aliases,
-                            'my_votes' => Vote::where('ranking_item_id', $item->id)
-                                ->where('user_identifier', $userId)
-                                ->count(),
-                        ];
-                    }),
+                    'items' => $ranking->items
+                        ->sortByDesc('votes')
+                        ->take(5)
+                        ->values()
+                        ->map(function ($item) use ($userId) {
+                            return [
+                                'id' => $item->id,
+                                'name' => $item->name,
+                                'votes' => $item->votes,
+                                'aliases' => $item->aliases,
+                                'my_votes' => $userId
+                                    ? Vote::where('ranking_item_id', $item->id)
+                                    ->where('user_identifier', $userId)
+                                    ->count()
+                                    : 0,
+                            ];
+                        }),
                 ];
             })
         );
