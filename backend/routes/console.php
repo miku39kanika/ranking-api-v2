@@ -38,7 +38,7 @@ Schedule::command('app:expire-plans')
 
 // ベータ版 Bot投票
 Schedule::command('bot:vote-rankings')
-    ->everyFiveMinutes()
+    ->everyMinute()
     ->withoutOverlapping();
 
 Schedule::command('subscriptions:grant-monthly-rewards')
