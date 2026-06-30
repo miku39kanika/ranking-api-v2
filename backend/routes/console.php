@@ -43,3 +43,10 @@ Schedule::command('bot:vote-rankings')
 
 Schedule::command('subscriptions:grant-monthly-rewards')
     ->dailyAt('03:00');
+
+
+Schedule::command(
+    'rankings:generate-ai-items --limit=20 --batch=5 --per-ranking=10'
+)
+    ->hourly()
+    ->withoutOverlapping();

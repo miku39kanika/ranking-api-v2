@@ -39,6 +39,7 @@ class GenerateAiRankingItems extends Command
 
         $query = Ranking::query()
             ->with(['items:id,ranking_id,name'])
+            ->withCount('items')
             ->where('ranking_type', $rankingType)
             ->whereExists(function ($q) {
                 $q->select(DB::raw(1))
@@ -56,7 +57,11 @@ class GenerateAiRankingItems extends Command
         }
 
         if ($onlyEmpty) {
+
             $query->whereDoesntHave('items');
+        } else {
+
+            $query->having('items_count', '<', $perRanking);
         }
 
         $rankings = $query->limit($limit)->get();
@@ -72,15 +77,23 @@ class GenerateAiRankingItems extends Command
         $skipped = 0;
 
         foreach ($rankings->chunk($batchSize) as $chunk) {
-            $payload = $chunk->map(function (Ranking $ranking) {
+            $payload = $chunk->map(function (Ranking $ranking) use ($perRanking) {
+
                 return [
                     'id' => $ranking->id,
                     'title' => $ranking->title,
-                    'existing_items' => $ranking->items->pluck('name')->values()->all(),
+                    'need' => max(
+                        0,
+                        $perRanking - $ranking->items_count
+                    ),
+                    'existing_items' => $ranking->items
+                        ->pluck('name')
+                        ->values()
+                        ->all(),
                 ];
             })->values()->all();
 
-            $this->info('Gemini generating items for ranking ids: '.implode(', ', array_column($payload, 'id')));
+            $this->info('Gemini generating items for ranking ids: ' . implode(', ', array_column($payload, 'id')));
 
             try {
                 $generatedRankings = $gemini->generateItemsForRankings($payload, $perRanking);
@@ -90,7 +103,7 @@ class GenerateAiRankingItems extends Command
             }
 
             $generatedByRankingId = collect($generatedRankings)
-                ->keyBy(fn ($row) => (int)($row['ranking_id'] ?? 0));
+                ->keyBy(fn($row) => (int)($row['ranking_id'] ?? 0));
 
             foreach ($chunk as $ranking) {
                 $row = $generatedByRankingId->get((int)$ranking->id);
@@ -103,7 +116,7 @@ class GenerateAiRankingItems extends Command
 
                 $existingNames = $ranking->items
                     ->pluck('name')
-                    ->map(fn ($name) => $this->normalizeComparable((string)$name))
+                    ->map(fn($name) => $this->normalizeComparable((string)$name))
                     ->all();
 
                 $items = $this->normalizeItems($row['items'] ?? [], $perRanking, $filter, $existingNames);
@@ -116,7 +129,7 @@ class GenerateAiRankingItems extends Command
 
                 if ($dryRun) {
                     $this->line("[DRY RUN] ranking_id={$ranking->id} {$ranking->title}");
-                    $this->line('  add: '.implode(', ', $items));
+                    $this->line('  add: ' . implode(', ', $items));
                     $created += count($items);
                     continue;
                 }
@@ -134,7 +147,7 @@ class GenerateAiRankingItems extends Command
                     }
                 });
 
-                $this->info("created items for ranking_id={$ranking->id}: ".count($items));
+                $this->info("created items for ranking_id={$ranking->id}: " . count($items));
             }
         }
 

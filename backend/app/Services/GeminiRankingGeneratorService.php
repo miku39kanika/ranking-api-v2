@@ -113,27 +113,30 @@ PROMPT;
         $itemsPerRanking = max(1, min($itemsPerRanking, 20));
 
         $rankingLines = collect($rankings)
-            ->map(function (array $ranking) {
+            ->map(function (array $ranking) use ($itemsPerRanking) {
                 $id = $ranking['id'];
                 $title = $ranking['title'];
+                $need = max(1, (int)($ranking['need'] ?? $itemsPerRanking));
                 $existingItems = $ranking['existing_items'] ?? [];
                 $existing = empty($existingItems)
                     ? 'なし'
                     : implode(' / ', array_slice($existingItems, 0, 50));
 
-                return "- ranking_id: {$id}\n  title: {$title}\n  existing_items: {$existing}";
+                return "- ranking_id: {$id}\ntitle: {$title}\n need: {$need}\n existing_items: {$existing}";
             })
             ->implode("\n");
 
         $prompt = <<<PROMPT
 あなたは日本語ランキングアプリ「なんでも！ランキング！」の編集者です。
-以下の既存ランキングに対して、ユーザーが投票しやすい追加項目を各ランキング {$itemsPerRanking} 個ずつ作ってください。
+以下の既存ランキングに対して、ユーザーが投票しやすい追加項目を作ってください。
+各ランキングには need が書かれています。
+need の数だけ items を返してください。
 
 対象ランキング:
 {$rankingLines}
 
 条件:
-- 各 ranking_id に対して items を {$itemsPerRanking} 個返す
+- 各 ranking_id に対して、need の数だけ items を返す
 - 既存項目と重複しない
 - 同じランキング内で項目を重複させない
 - item name は100文字以内
