@@ -586,7 +586,7 @@ class RankingController extends Controller
                     'id' => $ranking->id,
                     'title' => $ranking->title,
                     'has_voted' => $myTotalVotes > 0,
-                    'top5' => $ranking->items->map(function ($item) use ($userId) {
+                    'items' => $ranking->items->map(function ($item) use ($userId) {
                         return [
                             'id' => $item->id,
                             'name' => $item->name,
